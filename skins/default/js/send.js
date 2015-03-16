@@ -10,7 +10,7 @@ function submit_messages() {
 	$current = get_active_textarea();
 
 	/**
-	 *내용을 입력하였는지 검사
+	 * 내용을 입력하였는지 검사
 	 */
 	if (!$current.val() || $current.val() == initial_content) {
 		alert("내용을 입력해 주세요.");
@@ -19,7 +19,7 @@ function submit_messages() {
 	}
 
 	/**
-	 *발신전화번호 검사
+	 * 발신전화번호 검사
 	 */
 	var sNum = jQuery('#smsPurplebookCallback').val();
 	if (!checkCallbackNumber(sNum)) {
@@ -29,12 +29,12 @@ function submit_messages() {
 	}		
 
 	/**
-	 *받는사람 번호 구성
+	 * 받는사람 번호 구성
 	 */
 	var r_num = list_counting();
 
 	/**
-	 *받는사람이 없을 경우
+	 * 받는사람이 없을 경우
 	 */
 	if (r_num == 0) {
 		alert('받는사람을 입력하세요');
@@ -93,6 +93,7 @@ function send_json(content) {
 		, dataType : "json"
 		, success : function (data) {
 			size = content.length;
+			console.log("progress");
 			for (var i = 0; i < size; i++) {
 				if (content[i]["count"]) {
 					send_json.progress_count += parseInt(content[i]["list_count"]);
@@ -164,7 +165,7 @@ function sendMessageData() {
 	 */
 	if (sendMessageData.index >= $list.size() || sendMessageData.send_status == 'complete') {
 		sendMessageData.send_status = 'complete';
-
+		sendMessageData.list_status = null;
 		/**
 		 * 전송간격 시간대 별로 전송하는 것 종료
 		 */
@@ -192,12 +193,12 @@ function sendMessageData() {
 	/**
 	 * 발송대상에 있던 folder를 쪼개서 content_list에 넣는다
 	 */
-	content_list = messageInputFolder();
+	content_list = getFolderMessageList();
 
 	/**
 	 * folder집어넣기가 완료되면 개별발송건들을 content_list에 넣는다
 	 */
-	if (sendMessageData.send_status == 'f_complete') content_list = messageInput(content_list);
+	if (sendMessageData.list_status == 'f_complete') content_list = getMessageList(content_list);
 
 	/**
 	 *  첫번째 스크린 문자내용을 집어 넣는다
@@ -218,7 +219,7 @@ function sendMessageData() {
 /**
  * 발송대상의 content 정보를 받아서 형식에 맞게 고쳐준다
  */
-function messageInput(content_list) {
+function getMessageList(content_list) {
 	var speed = g_send_speed;
 
 	/**
@@ -318,7 +319,7 @@ function messageInput(content_list) {
 /**
  * 발송대상에 폴더가 있을 경우 정보를 받아서 형식에 맞게 고쳐준다
  */
-function messageInputFolder() {
+function getFolderMessageList() {
 	var speed = g_send_speed;
 
 	/**
@@ -335,20 +336,10 @@ function messageInputFolder() {
 
 	var content_list = new Array();
 
-	if (sendMessageData.send_status == 'f_complete') return content_list;
+	if (sendMessageData.list_status == 'f_complete') return content_list;
 
 	/**
-	 * Folder Idx 설정
-	 */
-	if (!sendMessageData.index) sendMessageData.index = 0;
-
-	/**
-	 * sendMessageData.display 설정
-	 */
-	if (!sendMessageData.display) sendMessageData.display = 0;
-
-	/**
-	 * page 설정
+	 * Folder page 설정
 	 */
 	if (!sendMessageData.page) sendMessageData.page = 1;
 
@@ -356,13 +347,19 @@ function messageInputFolder() {
 	 * folder list 가 없다면 완료처리 한다.
 	 */
 	if (list.size() == 0) {
-		sendMessageData.send_status = 'f_complete';
+		sendMessageData.list_status = 'f_complete';
 		return content_list;
 	}
 
+	/**
+	 * 전체 카운트 및 페이지 구하기
+	 */
+	var total_count	= 0;
+	var index = 0;
 	for (i = 0; i < list.size(); i++) {
-		target_list = jQuery(".pb_folder_address").eq(sendMessageData.index);
-		total_page = Math.ceil(target_list.attr('count') / speed);
+		index = i;
+		target_list = jQuery(".pb_folder_address").eq(i);
+		total_count = total_count + parseInt(target_list.attr('count'));
 
 		$content_input = jQuery('#smsPurplebookContentInput');
 		var size = jQuery('li', $content_input).size();
@@ -403,44 +400,18 @@ function messageInputFolder() {
 		 * content push
 		 */
 		content_list.push(content);
-
-		/**
-		 * 폴더의 주소록이 제한 갯수를 넘었을경우
-		 */
-		if (parseInt(target_list.attr('count')) > speed) {
-			sendMessageData.page += 1;
-
-			/**
-			 * Page가 최총 페이지에 도달하면 다음폴더로 이동
-			 */
-			if (sendMessageData.page > total_page) {
-				sendMessageData.page = 1;
-				sendMessageData.index += 1;
-			}
-
-			/**
-			 * 마지막 폴더일경우 완료처리를 해준다
-			 */
-			if (sendMessageData.index >= list.size()) {
-				sendMessageData.send_status= 'f_complete';
-				sendMessageData.index = 0;
-			}
-
-			return content_list;
-		}
-
-		sendMessageData.index += 1;
-
-		/**
-		 * 마지막 폴더일경우 완료처리를 해준다
-		 */
-		if (sendMessageData.index >= list.size()) {
-			sendMessageData.send_status= 'f_complete';
-			sendMessageData.index = 0;
-		}
-
-		return content_list;
 	}
+	
+	var total_page = Math.ceil(total_count / speed);
+	sendMessageData.page++;
+
+	if (sendMessageData.page > total_page) {
+		sendMessageData.page = 1;
+		sendMessageData.list_status = 'f_complete';
+		sendMessageData.index = index;
+	}
+
+	return content_list;
 }
 
 /**
@@ -461,10 +432,7 @@ function sendMessage() {
 	 * clear status text
 	 */
 	jQuery('.text','#layer_status').text('전송중입니다...');
-	/**
-	 * clear status
-	 */
-	jQuery('.status','#smsPurplebookTargetList li').remove();
+
 	/**
 	 * clear send_json attributes
 	 */
@@ -490,7 +458,7 @@ function sendMessage() {
 	params['g_mid'] = g_mid;
 	params['layer_name'] = 'layer_status';
 
-	layer_id = '#layer_status';
+	var layer_id = '#layer_status';
 
 	/**
 	 *  문자 전송 상태창 띄우기
@@ -516,7 +484,7 @@ function sendMessage() {
 	 */
 	if (jQuery("#message_interval_check").is(':checked')) {
 		g_send_interval = jQuery("#message_send_interval").val() * 1000 * 60;
-		sendMessageData.send_timer = setInterval(function() { sendMessageData();  }, g_send_interval);
+		sendMessageData.send_timer = setInterval(function() { sendMessageData(); }, g_send_interval);
 	} else {
 		sendMessageData();
 	}
@@ -562,38 +530,41 @@ function completeGetPointInfo(ret_obj, response_tags) {
 	mms_avail = calc_mms(obj, mms_point);
 
 	var count = list_counting();
-	if (getMsgType() == "sms") {
+	switch (getMsgType()) {
+		case "sms" : 
+			var content = get_all_content();
+			bytes = getTextBytes(content)[0];
+			npages = Math.ceil(bytes / 90);
 
-		var content = get_all_content();
-		bytes = getTextBytes(content)[0];
-		npages = Math.ceil(bytes / 90);
-
-		if ((count * npages) > sms_avail) {
-			alert(ret_obj['msg_not_enough_point'] + "\n"
+			if ((count * npages) > sms_avail) {
+				alert(ret_obj['msg_not_enough_point'] + "\n"
+						+ "현재 포인트: " + point + "\n"
+						+ word_send + "가능 SMS 건수: " + sms_avail  + "\n"
+						+ word_send + "예정 SMS 건수: " + (count * npages)
+					 );
+				return false;
+			}
+			break;
+		case "lms" :
+			if (count > lms_avail) {
+				alert(ret_obj['msg_not_enough_point'] + "\n"
 					+ "현재 포인트: " + point + "\n"
-					+ word_send + "가능 SMS 건수: " + sms_avail  + "\n"
-					+ word_send + "예정 SMS 건수: " + (count * npages)
-				 );
-			return false;
-		}
-	} else if (getMsgType() == 'lms') {
-		if (count > lms_avail) {
-			alert(ret_obj['msg_not_enough_point'] + "\n"
-				+ "현재 포인트: " + point + "\n"
-				+ word_send + "가능 LMS 건수: " + lms_avail  + "\n"
-				+ word_send + "예정 LMS 건수: " + count
-				);
-			return false;
-		}
-	} else {
-		if (count > mms_avail) {
-			alert(ret_obj['msg_not_enough_point'] + "\n"
-				+ "현재 포인트: " + point + "\n"
-				+ word_send + "가능 MMS 건수: " + mms_avail  + "\n"
-				+ word_send + "예정 MMS 건수: " + count
-				);
-			return false;
-		}
+					+ word_send + "가능 LMS 건수: " + lms_avail  + "\n"
+					+ word_send + "예정 LMS 건수: " + count
+					);
+				return false;
+			}
+			break;
+		case "mms" :
+			if (count > mms_avail) {
+				alert(ret_obj['msg_not_enough_point'] + "\n"
+					+ "현재 포인트: " + point + "\n"
+					+ word_send + "가능 MMS 건수: " + mms_avail  + "\n"
+					+ word_send + "예정 MMS 건수: " + count
+					);
+				return false;
+			}
+			break;
 	}
 	get_cashinfo();
 }
@@ -602,10 +573,6 @@ function completeGetPointInfo(ret_obj, response_tags) {
  * 사용자 캐쉬가져오기
  */
 function get_cashinfo() {
-	var obj = new Object();
-	obj.cash = 0;
-	obj.point = 0;
-
 	var params = new Array();
 	var response_tags = new Array('error','message','cash','point','sms_price','lms_price','mms_price','deferred_payment');
 	exec_xml('purplebook', 'getPurplebookCashInfo', params, completeGetCashInfo, response_tags);
