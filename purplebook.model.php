@@ -6,6 +6,10 @@
  */
 class purplebookModel extends purplebook
 {
+	function init()
+	{
+	}
+
 	/**
 	 * 모듈 환경설정값 가져오기
 	 */
