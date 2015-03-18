@@ -730,12 +730,12 @@ class purplebookModel extends purplebook
 		// 검색날짜가 있으면
 		if($vars->s_start)
 		{
-			$args->s_start = $vars->s_start . " 00:00:00";
+			$args->s_start = $vars->s_start . "000000";
 			Context::set('pb_result_start_date', $vars->s_start);
 		}
 		if($vars->s_end)
 		{
-			$args->s_end = $vars->s_end . " 23:59:59";
+			$args->s_end = $vars->s_end . "235959";
 			Context::set('pb_result_end_date', $vars->s_end);
 		}
 

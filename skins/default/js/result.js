@@ -23,8 +23,12 @@ function pb_load_result_list(page){
 	if (jQuery("#pb_result_count").val()) params['list_count'] = jQuery("#pb_result_count").val();
 
 	// 날짜
-	if (jQuery("#pb_result_start_date").val()) params['s_start'] = jQuery("#pb_result_start_date").val();
-	if (jQuery("#pb_result_end_date").val()) params['s_end'] = jQuery("#pb_result_end_date").val();
+	if (jQuery("#pb_result_start_date").val()) {
+	   	params['s_start'] = jQuery("#pb_result_start_date").val();
+	}
+	if (jQuery("#pb_result_end_date").val()) {
+	   	params['s_end'] = jQuery("#pb_result_end_date").val();
+	}
 
 	// 검색어
 	if (jQuery("#pb_result_search").val()) params['search_keyword'] = jQuery("#pb_result_search").val();
@@ -40,9 +44,9 @@ function pb_load_result_list(page){
 		day = now.getDate()>9 ? ''+now.getDate() : '0'+now.getDate();
 		current_date = year + '-' + mon + '-' + day;
 
-		jQuery("#pb_result_start_date").val(current_date);
+		jQuery("#pb_result_start_date").val(year + mon + day);
 		jQuery("#pb_result_start_date").next().val(current_date);
-		jQuery("#pb_result_end_date").val(current_date);
+		jQuery("#pb_result_end_date").val(year + mon + day);
 		jQuery("#pb_result_end_date").next().val(current_date);
 
 		params['s_start'] = jQuery("#pb_result_start_date").val();

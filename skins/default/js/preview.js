@@ -30,9 +30,8 @@ function pb_load_preview_list(node_id) {
 	 */
 	for(var i = 0; i < p_screen.size(); i++){
 		context = jQuery('.phonescreen','#smsPurplebookContentInput')[i];
-		if (!jQuery(context).val()) return;
-
 		text[i] = jQuery(context).val();
+		if (!jQuery(context).val()) text[i] = "";
 
 		/**
 		 * 받는사람들 

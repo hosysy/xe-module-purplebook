@@ -67,20 +67,13 @@ if (!status_javascript_permission) {
 
 			$('.text','#layer_status').text('전송을 재개하였습니다.');
 
-			/**
-			 * 발송간격설정이 체크되있으면 전송간격 시간을 가져온다
-			 */
-			if (jQuery("#message_interval_check").is(':checked')) {
-				g_send_interval = jQuery("#message_send_interval").val() * 1000 * 60;
-			}
-
 			sendMessageData.send_status = 'sending'; 
 
 			/**
 			 * sendMessageData.send_timer로 보통발송과 발송간격발송 구분
 			 */
 			if (jQuery("#message_interval_check").is(':checked')) {
-				g_send_interval = jQuery("#message_send_interval").val() * 100 * 60;
+				g_send_interval = jQuery("#message_send_interval").val() * 1000 * 60;
 				sendMessageData.send_timer = setInterval(function() { sendMessageData();  }, g_send_interval);
 			} else {
 				sendMessageData();
