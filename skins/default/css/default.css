@@ -156,7 +156,7 @@ p.pop_title { font-size:13px; color:#fff; font-weight:bold; }
 #layer_share .bodyArea ul#share_list li span.user_id { width:66px; text-overflow:ellipsis; display:inline-block; white-space:nowrap; overflow:hidden; } 
 #layer_share .bodyArea ul#share_list li span.nick_name { width:66px; text-overflow:ellipsis; display:inline-block; white-space:nowrap; overflow:hidden; }
 #layer_share .bodyArea ul#share_list li span.delete { cursor:pointer; text-indent:-1000em; padding:0; border:0 none; margin: 2px 0px 0px 10px; width: 9px; display: inline-block; background:url('../img/btn_delete.gif') no-repeat; height:9px; overflow: hidden; } 
-#layer_share .bottomArea #input_user_id { width:100px; vertical-align:top; }
+#layer_share .bottomArea #input_user_id { width:100px; }
 #layer_share .bottomArea button{ width:44px; height:20px; margin-left:2px; vertical-align:middle; background:url('../img/btn_append.gif') no-repeat; border:0 none; text-indent:-1000em; *margin-left:5px; overflow:hidden; cursor:pointer;} 
 #layer_share .bottomArea a { display:inline; }
 

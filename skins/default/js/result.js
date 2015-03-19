@@ -9,7 +9,7 @@ if (!pb_result_loaded) var pb_result_loaded = false;
 /**
  * 리스트 불러오기
  */
-function pb_load_result_list(page){
+function pb_load_result_list(page) {
 	var params = new Array();
 	var response_tags = new Array('error','message','data','list_template');
 
@@ -36,8 +36,8 @@ function pb_load_result_list(page){
 	// Status 검색
 	if (jQuery("#pb_result_status").val()) params['status'] = jQuery("#pb_result_status").val();
 
-	// 처음 로드 할때 현재날짜를 기준으로 검색한다.
-	if (pb_result_loaded == false) {
+	// 날짜가 없다면 현재날짜를 기준으로 검색한다.
+	if (!jQuery("#pb_result_start_date").next().val() && !jQuery("#pb_result_end_date").next().val()) {
 		now = new Date();
 		year= now.getFullYear();
 		mon = (now.getMonth()+1)>9 ? ''+(now.getMonth()+1) : '0'+(now.getMonth()+1);
