@@ -247,17 +247,14 @@ class purplebookController extends purplebook
 		$subfolder = 0;
 
 		// check node_id
-		if(!$node_id)
-		{
-			return new Object(-1, 'msg_invalid_request');
-		}
+		if(!$node_id) return new Object(-1, 'msg_invalid_request');
+			
 
 		// get node_route
 		$args->node_id = $node_id;
 		$args->member_srl= $member_srl;
 		$output = executeQuery('purplebook.getPurplebook', $args);
-		if(!$output->toBool())
-			return $output;
+		if(!$output->toBool()) return $output;
 		$node_route = $output->data->node_route . $node_id . '.';
 
 		// get subfolder count
@@ -891,8 +888,16 @@ class purplebookController extends purplebook
 		if(!$output->toBool()) return $output;
 
 		// root folder has no node_id.
-		if($previous_node) $this->updateSubfolder($logged_info->member_srl, $previous_node);
-		if($parent_id) $this->updateSubfolder($logged_info->member_srl, $parent_id);
+		if($previous_node)
+		{
+			$this->updateSubfolder($logged_info->member_srl, $previous_node);
+			$this->updateSubnode($logged_info->member_srl, $previous_node);
+		}
+		if($parent_id)
+		{
+			$this->updateSubfolder($logged_info->member_srl, $parent_id);
+			$this->updateSubnode($logged_info->member_srl, $parent_id);
+		}
 	}
 
 	/**

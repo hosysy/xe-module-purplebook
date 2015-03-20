@@ -296,6 +296,7 @@
 		$(document).on('click', 'ul#smsPurplebookTargetList li span.delete', function() {
 			$(this).parent().remove();
 			updateTargetListCount();
+			display_cost();
 		});
 
 		/**
