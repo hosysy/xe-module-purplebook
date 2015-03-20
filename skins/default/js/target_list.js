@@ -461,7 +461,7 @@ function addNum(newNum, rName, node_id) {
 		/**
 		 * pop_message 호출
 		 */
-		call_pb_pop_message(".pop_overlap", "중복번호에 추가되었습니다");
+		call_pb_pop_message(".pop_overlap", "중복번호로 제외되었습니다.");
 
 		return 1;
 	}
