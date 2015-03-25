@@ -4,10 +4,12 @@
 
 var MMS_BYTES_LIMIT = 2000;
 
-/**
- * tipsy
- */
-jQuery('input, a, img, button','#smsPurplebook,#smsMessage').filter(function(index) { return !jQuery(this).hasClass('help'); }).tipsy();
+(function($) {
+	jQuery(function($) {
+		// tipsy
+		jQuery('input, a, img, button','#smsPurplebook,#smsMessage').filter(function(index) { return !jQuery(this).hasClass('help'); }).tipsy();
+	});
+}) (jQuery);
 
 function getRandomNumber(range) {
 	return Math.floor(Math.random() * range);
@@ -20,8 +22,7 @@ function getRandomChar() {
 
 function randomID(size) {
 	var str = "";
-	for(var i = 0; i < size; i++)
-	{
+	for(var i = 0; i < size; i++) {
 		str += getRandomChar();
 	}
 	return str;
