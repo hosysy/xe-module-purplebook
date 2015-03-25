@@ -93,7 +93,6 @@ function send_json(content) {
 		, dataType : "json"
 		, success : function (data) {
 			size = content.length;
-			console.log("progress");
 			for (var i = 0; i < size; i++) {
 				if (content[i]["count"]) {
 					send_json.progress_count += parseInt(content[i]["list_count"]);

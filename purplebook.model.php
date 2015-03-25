@@ -1002,9 +1002,6 @@ class purplebookModel extends purplebook
 	 */
 	function getPopupLayer()
 	{
-		$logged_info = Context::get('logged_info');
-		if(!Context::get('is_logged') || !$logged_info) return new Object(-1, 'msg_login_required');
-
 		$oModuleModel = &getModel("module");
 		$oTemplate = &TemplateHandler::getInstance();
 

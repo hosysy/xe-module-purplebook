@@ -417,7 +417,7 @@ class purplebookController extends purplebook
 	function insertFile($save_filename, $file_srl)
 	{
 		$logged_info = Context::get('logged_info');
-		if(!$logged_info) return new Object(-1, 'login_required');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
 
 		// 파일 정보 구함
 		list($width, $height, $type, $attrs) = @getimagesize($save_filename);
@@ -551,7 +551,7 @@ class purplebookController extends purplebook
 	function procPurplebookSaveMessage() 
 	{
 		$logged_info = Context::get('logged_info');
-		if(!$logged_info) return new Object(-1, 'login_required');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
 		$args->message_srl = getNextSequence();
 		$args->member_srl = $logged_info->member_srl;
 		$args->content = Context::get('content');
@@ -1087,7 +1087,7 @@ class purplebookController extends purplebook
 	function procPurplebookDeleteCallbackNumber() 
 	{
 		$logged_info = Context::get('logged_info');
-		if(!Context::get('is_logged') || !$logged_info) return new Object(-1, 'login_required');
+		if(!Context::get('is_logged') || !$logged_info) return new Object(-1, 'msg_login_required');
 
 		$callback_srl = Context::get('callback_srl');
 		if(!$callback_srl) return new Object(-1, 'msg_invalid_request');
@@ -1125,7 +1125,7 @@ class purplebookController extends purplebook
 		$logged_info = Context::get('logged_info');
 		if(!$logged_info)
 		{
-			return new Object(-1, 'login_required');
+			return new Object(-1, 'msg_login_required');
 		}
 
 		$args->receiver_srl = getNextSequence();
@@ -1154,7 +1154,7 @@ class purplebookController extends purplebook
 		$logged_info = Context::get('logged_info');
 		if(!$logged_info)
 		{
-			return new Object(-1, 'login_required');
+			return new Object(-1, 'msg_login_required');
 		}
 
 		$args->member_srl = $logged_info->member_srl;
@@ -1170,7 +1170,7 @@ class purplebookController extends purplebook
 	function procPurplebookDeleteMessage() 
 	{
 		$logged_info = Context::get('logged_info');
-		if(!Context::get('is_logged') || !$logged_info) return new Object(-1, 'login_required');
+		if(!Context::get('is_logged') || !$logged_info) return new Object(-1, 'msg_login_required');
 
 		$args->member_srl = $logged_info->member_srl;
 		$args->message_srl = Context::get('message_srl');
