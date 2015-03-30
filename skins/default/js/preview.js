@@ -1,4 +1,13 @@
 /**
+ * esc버튼 눌렀을시 창 닫히도록
+ */
+jQuery(this).on('keydown', this, function (event) {
+	if (event.which == 27) {
+		pb_close_preview();
+	}
+});
+
+/**
  * check that already loaded
  */
 if (!pb_preview_loaded) var pb_preview_loaded = false;

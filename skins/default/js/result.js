@@ -7,6 +7,15 @@
 if (!pb_result_loaded) var pb_result_loaded = false;
 
 /**
+ * esc버튼 눌렀을시 창 닫히도록
+ */
+jQuery(this).on('keydown', this, function (event) {
+	if (event.which == 27) {
+		pb_close_result();
+	}
+});
+
+/**
  * 리스트 불러오기
  */
 function pb_load_result_list(page) {

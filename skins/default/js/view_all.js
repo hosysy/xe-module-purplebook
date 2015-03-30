@@ -4,6 +4,15 @@
  */
 
 /**
+ * esc버튼 눌렀을시 창 닫히도록
+ */
+jQuery(this).on('keydown', this, function (event) {
+	if (event.which == 27) {
+		pb_close_address();
+	}
+});
+
+/**
  * check that already loaded
  */
 if (!pb_already_loaded) var pb_already_loaded = false;
@@ -194,7 +203,6 @@ function pb_close_address() {
 
 	pb_load_list(null, true); // 주소록 목록 새로고침
 }
-
 
 /**
  * 전체보기 추가 폼, 히스토리 감추기/보이기

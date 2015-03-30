@@ -69,7 +69,7 @@ span.checkbox.on { background-position:0px -13px; }
 .purplebook_left .left_select .bodyArea ul#smsPurplebookList li .modifyPhone {width:120px; font:9pt Arial; letter-spacing:3px; }
 
 /* centeral arrow area */
-.purplebook_arrow { float:left; width:50px; padding-top:160px; text-align:center; overflow:hidden; vertical-align:middle; }
+.purplebook_arrow { float:left; width:40px; padding-top:160px; text-align:center; overflow:hidden; vertical-align:middle; }
 .purplebook_arrow .btn_arrow_right a { display:block; margin-bottom:30px; }
 
 /* stage 3 right target list area */
