@@ -183,6 +183,9 @@ class purplebookController extends purplebook
 			if(!$output->toBool()) return $output;
 		}
 
+		// 발송루트 추가 
+		$args->route = "Purplebook";
+
 		// 메시지 갯수가 limit을 넘긴다면
 		if(count($extension) > 1000) 
 		{
