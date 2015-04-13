@@ -8,6 +8,11 @@ var MMS_BYTES_LIMIT = 2000;
 	jQuery(function($) {
 		// tipsy
 		jQuery('input, a, img, button','#smsPurplebook,#smsMessage').filter(function(index) { return !jQuery(this).hasClass('help'); }).tipsy();
+
+		jQuery(document).on("click", "#pb_move_bottom", function(){
+			$("html,body").animate({scrollTop:$(document).height()}, 0);
+			return false;
+		});
 	});
 }) (jQuery);
 

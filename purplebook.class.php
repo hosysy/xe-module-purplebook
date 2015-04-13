@@ -43,6 +43,7 @@ class purplebook extends ModuleObject
 		if (!$oDB->isIndexExists("purplebook","idx_memo1")) return true;
 		if (!$oDB->isIndexExists("purplebook","idx_memo2")) return true;
 		if (!$oDB->isIndexExists("purplebook","idx_memo3")) return true;
+		if (!$oDB->isIndexExists("purplebook","idx_node_type")) return true;
 
         return false;
     }
@@ -77,9 +78,13 @@ class purplebook extends ModuleObject
 		{
 			$oDB->addIndex("purplebook","idx_memo2", array("memo2"));
 		}
-		if (!$oDB->isIndexExists("purplebook","idx_memo3")) 
+		if (!$oDB->isIndexExists("purplebook","idx_memo3"))
 		{
 			$oDB->addIndex("purplebook","idx_memo3", array("memo3"));
+		}
+		if (!$oDB->isIndexExists("purplebook","idx_node_type"))
+		{
+			$oDB->addIndex("purplebook","idx_node_type", array("node_type"));
 		}
     }
 

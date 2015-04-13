@@ -4,7 +4,7 @@
 	<column name="user_id" type="varchar" size="80" notnull="notnull" index="idx_user_id" />
 	<column name="node_route" type="varchar" size="250" notnull="notnull" index="idx_node_route" />
 	<column name="node_name" type="varchar" size="80" notnull="notnull" index="idx_node_name" />
-	<column name="node_type" type="char" size="1" notnull="notnull" />
+	<column name="node_type" type="char" size="1" notnull="notnull" index="idx_node_type" />
 	<column name="phone_num" type="varchar" size="40" notnull="notnull" index="idx_phone_num" />
 	<column name="memo1" type="varchar" size="250" index="idx_memo1" />
 	<column name="memo2" type="varchar" size="250" index="idx_memo2" />
