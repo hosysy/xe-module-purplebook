@@ -563,6 +563,8 @@ jQuery(document).ready(function($){
 		jQuery("#excel_node_name").val(node.attr('node_name'));
 		jQuery("#excel_node_type").val('2');
 
+		jQuery("#excel_loading_box").show();
+
 		jQuery("#add_address_excel_form").ajaxSubmit({
 			dataType : 'json',
 			success : function(data){
@@ -577,10 +579,12 @@ jQuery(document).ready(function($){
 
 				// 전체보기 Status와 History에 글올리기
 				pb_set_address_status("엑셀파일로 추가되었습니다. "); 
+				jQuery("#excel_loading_box").hide();
 			},
 			error:function(request,status,error){
 				// ajaxSubmit 실패시 
 				alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error+"\n"+"status:"+status);
+				jQuery("#excel_loading_box").hide();
 			}
 		});
 		return false;

@@ -11,6 +11,8 @@
 
 /* Full Address Button */
 #pb_layer_box a.view_close_btn { color:#397fb5; padding-top:5px; font-size:13px; float:left; }
+#excel_loading_box { color:#397fb5; padding-top:2px; font-size:13px; float:left; line-height:10px; display:none; }
+#excel_loading_box img { width:17px; height:17px; }
 #pb_layer_box button { text-shadow:1px 1px 1px #fff; border-radius:5px; border:1px solid #d9d9d9; cursor:pointer; color:#555; font-family:'NanumGothic'; font-size:11px; padding:3px 7px; }
 #pb_layer_box button.excel_add { border-radius:0 5px 5px 0; margin-left:-3px; border-left:0; }
 #pb_layer_box button.individual_add { border-radius:5px 0 0 5px; }
