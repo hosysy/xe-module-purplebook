@@ -424,10 +424,7 @@ function pb_load_list(node, refresh) {
 	jQuery('#smsPurplebookSelectedFolderName').text(node.attr('node_name'));
 
 	// 새로고침하는 경우
-	if (refresh) {
-		pb_load_list.page = 1;
-		jQuery('#smsPurplebookList').html('');
-	}
+	if (refresh) pb_load_list.page = 1;
 
 	jQuery.ajax({
 		type : "POST"
@@ -447,7 +444,7 @@ function pb_load_list(node, refresh) {
 			   alert(data.message);
 			   return -1;
 			}
-			//jQuery('#smsPurplebookList').html('');
+			if (refresh) jQuery('#smsPurplebookList').html('');
 
 			for (i = 0; i < data.data.length; i++)
 			{
