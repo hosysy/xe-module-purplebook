@@ -17,7 +17,7 @@
 		 * 폴더를 발송대상에 추가
 		 */
 		$('#addFolder').click(function() {
-			add_folder_to_recipient();
+			add_folder_to_target();
 			return false; // bacause of a(anchor) tag
 		});
 
@@ -93,101 +93,6 @@
 			return countList;
 		}
 
-		/**
-		 * 주소목록에 선택된 폴더를 받는사람 목록으로 추가한다.
-		 */
-		function add_folder(node_route, node_id, f_name) {
-			$except_list = jQuery('#smsPurplebookExceptList');
-
-			var params = new Array();
-			var response_tags = new Array('error','message','data');
-
-			params['node_route'] = node_route + node_id + ".";
-			
-			/**
-			 * 최상위 폴더가 들어오면 node_id에 node_route가 들어오기 때문에 처리를 해줘야한다.
-			 */
-			if(node_id == 'f') params['node_route'] = node_id + ".";
-			list = jQuery(".pb_folder_address");
-			exec_xml('purplebook', 'getPurplebookListCount', params, function(ret_obj) {
-				/**
-				 * 이상이 없을 경우 추가 (개별선택, 삭제 이벤트 포함) 
-				 * 메시지 보낼때 폴더먼저 보내기 때문에 폴더는 항상 리스트 위쪽으로
-				 */
-				if(list.size() > 0) {
-					list.eq(list.size() - 1).after('<li class="pb_folder_address" id="folder_' + node_id + '" ' + 'node_id=' + node_id + ' count=' + ret_obj["data"] + ' node_route=' + params['node_route'] + '><span class="checkbox"></span><span class="name">' + f_name + '</span><span class="number">(' + ret_obj["data"] + '명)' + '</span><span class="delete" title="삭제">삭제</span><span class="statusBox"></span></li>');
-				} else {
-					$('#smsPurplebookTargetList').prepend('<li class="pb_folder_address" id="folder_' + node_id + '" ' + 'node_id=' + node_id + ' count=' + ret_obj["data"] + ' node_route=' + params['node_route'] + '><span class="checkbox"></span><span class="name">' + f_name + '</span><span class="number">(' + ret_obj["data"] + '명)' + '</span><span class="delete" title="삭제">삭제</span><span class="statusBox"></span></li>');
-				}
-			}, response_tags);
-	   
-			return 0;
-		}
-
-		/**
-		 * 폴더의 node_id로 명단을 가져와서 받는사람 목록에 추가한다.
-		 */
-		function add_folder_to_recipient() {
-			var t = $('#smsPurplebookTree').jstree("get_selected");
-			if (t.length == 0) {
-				alert('체크된 폴더가 없습니다.\n왼쪽 폴더목록에서 체크박스에 체크하세요.');
-				return;
-			}
-
-			node_id = t.attr('node_id')
-
-			/**
-			 * 최상위 폴더가 들어오면 node_id에 node_route가 들어오기 때문에 처리를 해줘야한다.
-			 */
-			if (node_id == 'f.') {
-				node_id = 'f';
-			}
-
-			/**
-			 * 이미 존재하는 폴더인지 검사
-			 */
-			if ($('#folder_' + node_id).length > 0)
-			{
-				if ($('#f_dup_' + node_id).length > 0) {
-					var $count = $('.count', $('#f_dup_' + node_id).parent());
-					var countVal = $count.text();
-
-					countVal = parseInt(countVal) + 1;
-					$count.text(countVal);
-				} else {
-					overlap_count = $('#pb_overlap_count').text();
-					overlap_val = parseInt(overlap_count) + 1;
-
-					$("#pb_overlap_count").html(overlap_val);
-
-					$except_list.append('<li><span class="name">' + t.attr('node_name') + '</span><span id="f_dup_' + node_id + '" class="number">' + t.attr('count') + '</span><span class="count">1</span></li>');
-				}
-
-				/**
-				 * pop_message 호출
-				 */
-				call_pb_pop_message(".pop_overlap", "중복번호에 추가되었습니다");
-
-				return 1;
-			}
-			p_show_waiting_message();
-
-			/**
-			 * 폴더 추가
-			 */
-			add_folder(t.attr('node_route'), node_id, t.attr('node_name'));
-
-			/**
-			 * 이렇게 안하면 처음에 카운트를 제대로 세지 못한다.
-			 */
-			setTimeout(function() {
-				//updateExceptListCount();
-				scrollBottomTargetList();
-				updateTargetListCount();
-				display_cost();
-				p_hide_waiting_message();
-			}, 500);
-		}
 
 		/**
 		 * 주소목록에 선택된 명단을 받는사람 목록으로 추가한다.
@@ -515,4 +420,102 @@ function cellphone_generalize(text) {
 	obj.count = countList;
 
 	return obj;
+}
+
+/**
+ * 주소목록에 선택된 폴더를 받는사람 목록으로 추가한다.
+ */
+function add_folder(node_route, node_id, f_name) {
+	$except_list = jQuery('#smsPurplebookExceptList');
+
+	var params = new Array();
+	var response_tags = new Array('error','message','data');
+
+	params['node_route'] = node_route + node_id + ".";
+	
+	/**
+	 * 최상위 폴더가 들어오면 node_id에 node_route가 들어오기 때문에 처리를 해줘야한다.
+	 */
+	if(node_id == 'f') params['node_route'] = node_id + ".";
+	list = jQuery(".pb_folder_address");
+	exec_xml('purplebook', 'getPurplebookListCount', params, function(ret_obj) {
+		/**
+		 * 이상이 없을 경우 추가 (개별선택, 삭제 이벤트 포함) 
+		 * 메시지 보낼때 폴더먼저 보내기 때문에 폴더는 항상 리스트 위쪽으로
+		 */
+		if(list.size() > 0) {
+			list.eq(list.size() - 1).after('<li class="pb_folder_address" id="folder_' + node_id + '" ' + 'node_id=' + node_id + ' count=' + ret_obj["data"] + ' node_route=' + params['node_route'] + '><span class="checkbox"></span><span class="name">' + f_name + '</span><span class="number">(' + ret_obj["data"] + '명)' + '</span><span class="delete" title="삭제">삭제</span><span class="statusBox"></span></li>');
+		} else {
+			jQuery('#smsPurplebookTargetList').prepend('<li class="pb_folder_address" id="folder_' + node_id + '" ' + 'node_id=' + node_id + ' count=' + ret_obj["data"] + ' node_route=' + params['node_route'] + '><span class="checkbox"></span><span class="name">' + f_name + '</span><span class="number">(' + ret_obj["data"] + '명)' + '</span><span class="delete" title="삭제">삭제</span><span class="statusBox"></span></li>');
+		}
+	}, response_tags);
+
+	return 0;
+}
+
+/**
+ * 폴더의 node_id로 명단을 가져와서 받는사람 목록에 추가한다.
+ */
+function add_folder_to_target() {
+	$except_list = jQuery('#smsPurplebookExceptList');
+
+	var t = jQuery('#smsPurplebookTree').jstree("get_selected");
+	if (t.length == 0) {
+		alert('체크된 폴더가 없습니다.\n왼쪽 폴더목록에서 체크박스에 체크하세요.');
+		return;
+	}
+
+	node_id = t.attr('node_id');
+
+	/**
+	 * 최상위 폴더가 들어오면 node_id에 node_route가 들어오기 때문에 처리를 해줘야한다.
+	 */
+	if (node_id == 'f.') {
+		node_id = 'f';
+	}
+
+	/**
+	 * 이미 존재하는 폴더인지 검사
+	 */
+	if (jQuery('#folder_' + node_id).length > 0)
+	{
+		if (jQuery('#f_dup_' + node_id).length > 0) {
+			var $count = jQuery('.count', jQuery('#f_dup_' + node_id).parent());
+			var countVal = $count.text();
+
+			countVal = parseInt(countVal) + 1;
+			$count.text(countVal);
+		} else {
+			overlap_count = jQuery('#pb_overlap_count').text();
+			overlap_val = parseInt(overlap_count) + 1;
+
+			jQuery("#pb_overlap_count").html(overlap_val);
+
+			$except_list.append('<li><span class="name">' + t.attr('node_name') + '</span><span id="f_dup_' + node_id + '" class="number">' + t.attr('count') + '</span><span class="count">1</span></li>');
+		}
+
+		/**
+		 * pop_message 호출
+		 */
+		call_pb_pop_message(".pop_overlap", "중복번호에 추가되었습니다");
+
+		return 1;
+	}
+	p_show_waiting_message();
+
+	/**
+	 * 폴더 추가
+	 */
+	add_folder(t.attr('node_route'), node_id, t.attr('node_name'));
+
+	/**
+	 * 이렇게 안하면 처음에 카운트를 제대로 세지 못한다.
+	 */
+	setTimeout(function() {
+		//updateExceptListCount();
+		scrollBottomTargetList();
+		updateTargetListCount();
+		display_cost();
+		p_hide_waiting_message();
+	}, 500);
 }

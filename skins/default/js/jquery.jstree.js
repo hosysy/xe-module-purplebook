@@ -1158,22 +1158,7 @@
 				if(this.data.crrm.cp_nodes) { this.move_node(this.data.crrm.cp_nodes, obj, false, true); }
 				this.data.crrm.cp_nodes = false;
 				this.data.crrm.ct_nodes = false;
-			},
-            share : function (obj) {
-				obj = this._get_node(obj);
-				if(!obj || !obj.length) { return false; }
-                pb_share_folder(obj);
-            },
-            properties : function (obj) {
-				obj = this._get_node(obj);
-				if(!obj || !obj.length) { return false; }
-                pb_view_properties(obj);
-            },
-            xldownload: function (obj) {
-				obj = this._get_node(obj);
-				if(!obj || !obj.length) { return false; }
-                pb_excel_download(obj);
-            }
+			}
 		}
 	});
 	// include the crr plugin by default
@@ -2998,39 +2983,7 @@
 		defaults : { 
 			select_node : false, // requires UI plugin
 			show_at_node : true,
-			items : { // Could be a function that should return an object like this one
-				"create" : {
-					"separator_before"	: false,
-					"separator_after"	: true,
-					"label"				: "Create",
-					"action"			: function (obj) { this.create(obj); }
-				},
-				"rename" : {
-					"separator_before"	: false,
-					"separator_after"	: false,
-					"label"				: "Rename",
-					"action"			: function (obj) { this.rename(obj); }
-				},
-				"remove" : {
-					"separator_before"	: false,
-					"icon"				: false,
-					"separator_after"	: false,
-					"label"				: "Delete",
-					"action"			: function (obj) { this.remove(obj); }
-				},
-                "cut" : {
-                    "separator_before"	: false,
-                    "separator_after"	: false,
-                    "label"				: "Cut",
-                    "action"			: function (obj) { this.cut(obj); }
-                },
-                "paste" : {
-                    "separator_before"	: false,
-                    "icon"				: false,
-                    "separator_after"	: false,
-                    "label"				: "Paste",
-                    "action"			: function (obj) { this.paste(obj); }
-                }
+			items : { 
 			}
 		},
 		_fn : {

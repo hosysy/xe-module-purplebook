@@ -6,8 +6,59 @@
 (function($) {
 	jQuery(function($) {
 		init_purplebook_tree(g_tpl_path+'img/');
+		set_click_direction(get_click_direction(), false);
 	});
 }) (jQuery);
+
+/**
+ * set mouse click button as left or right for displaying menu.
+ * it internally uses html5 localStorage.
+ */
+function set_click_direction(direction, display_alert) {
+	if (typeof(display_alert) == 'undefined') display_alert = true; 
+
+	if (window["localStorage"]) {
+		localStorage.setItem('click_direction', direction); 
+	}
+
+	if (direction == 'left') {
+		jQuery(document).on('click', '#smsPurplebookTree li a', function() {
+			jQuery(this).trigger('contextmenu');
+		});
+		if (display_alert) alert('마우스 왼쪽 클릭 때 메뉴가 뜹니다.');
+	}
+	if (direction == 'right') {
+		jQuery(document).off('click', '#smsPurplebookTree li a');
+		if (display_alert) alert('마우스 오른쪽 클릭 때 메뉴가 뜹니다.');
+	}
+}
+
+/**
+ * get mouse click button direction
+ * it internally uses html5 localStorage.
+ * return left or right
+ */
+function get_click_direction() {
+	if (!window["localStorage"]) return 'left';
+
+	var direction = localStorage.getItem('click_direction');
+
+	// not in 'left' and 'right'
+	if (['left', 'right'].indexOf(direction) == -1) return 'left';
+
+	return direction;
+}
+
+/**
+ * toggle mouse click direction, if the current direction is left then turn into right, otherwise turn into left.
+ */
+function toggle_click_direction() {
+	if (get_click_direction() == 'left') {
+		set_click_direction('right');
+	} else {
+		set_click_direction('left');
+	}
+}
 
 /**
  * 해당 node 이동
@@ -344,10 +395,22 @@ function init_purplebook_tree(img_base) {
 		},
 		"contextmenu" : {
 			"items" : {
-				"create" : {
+				"add_to_target" : {
+					"separator_before"	: false,
+					"separator_after"	: false,
+					"label"				: "발송대상에 추가",
+					"action"			: function (obj) { 	add_folder_to_target(); }
+				},
+				"edit" : {
 					"separator_before"	: false,
 					"separator_after"	: true,
-					"label"				: "만들기",
+					"label"				: "연락처 관리",
+					"action"			: function (obj) { popup_fullscreen_layer('view_all', '#pb_view_all'); }
+				},
+				"create" : {
+					"separator_before"	: false,
+					"separator_after"	: false,
+					"label"				: "새폴더",
 					"action"			: function (obj) { this.create(obj); }
 				},
 				"rename" : {
@@ -381,21 +444,28 @@ function init_purplebook_tree(img_base) {
 					"icon"				: false,
 					"separator_after"	: false,
 					"label"				: "공유",
-					"action"			: function (obj) { this.share(obj); }
+					"action"			: function (obj) { pb_share_folder(obj); }
 				},
 				"properties" : {
 					"separator_before"	: false,
 					"icon"				: false,
 					"separator_after"	: false,
 					"label"				: "정보보기",
-					"action"			: function (obj) { this.properties(obj); }
+					"action"			: function (obj) { pb_view_properties(obj); }
 				},
 				"xldownload" : {
 					"separator_before"	: true,
 					"icon"				: false,
 					"separator_after"	: false,
 					"label"				: "엑셀 다운로드",
-					"action"			: function (obj) { this.xldownload(obj); }
+					"action"			: function (obj) { pb_excel_download(obj); }
+				},
+				"click_direction" : {
+					"separator_before"	: true,
+					"icon"				: false,
+					"separator_after"	: false,
+					"label"				: "마우스 클릭버튼 전환",
+					"action"			: function (obj) { toggle_click_direction(); }
 				}
 			}
 		}
@@ -507,6 +577,7 @@ function init_purplebook_tree(img_base) {
 	})
 	.bind("select_node.jstree", function(e, data) {
 		var node = data.rslt.obj;
+		jQuery('#smsPurplebookTree').jstree("open_node", node);
 		pb_load_list(node);
 	});
 }

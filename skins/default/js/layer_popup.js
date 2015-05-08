@@ -646,3 +646,21 @@ function completeLoadSavedMessages(ret_obj,response_tags) {
 		$list.append('<li>저장된 내용이 없습니다</li>');
 	}
 }
+
+/**
+ * popup fullscreen layer
+ * 다른 fullscreen형태의 layer들도 이 function을 사용하도록 하면 좋겠음.
+ */
+function popup_fullscreen_layer(layer_name, layer_selector) {
+	var params = new Array();
+	var response_tags = new Array('error','message','data');
+
+	params['g_mid'] = g_mid;
+	params['layer_name'] = layer_name;
+
+	exec_xml('purplebook', 'getPopupLayer', params, function(ret_obj) {
+		if (ret_obj["data"]) {
+			jQuery(layer_selector).html(ret_obj["data"]);
+		}
+	}, response_tags);
+}
