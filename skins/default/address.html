@@ -182,8 +182,8 @@
 				<p><input type="text" maxlength="4" value="2400" class="input_text" id="message_send_limit" readonly />개 번호를 <input type="text" maxlength="3" value="1" class="input_text minput" id="message_send_interval" readonly />분 마다 전송</p>
 			</div>
 			<div class="add_area">
-				<input type="text" id="smsPurplebookCallback" maxlength="20" value="{$callback}" title="발신번호 입력" />
-				<button class="btn_show_layer" title="발신번호 관리">발신번호관리</button>
+				<input type="text" id="smsPurplebookCallback" maxlength="20" value="{$callback}" readonly="readonly" title="발신번호 입력" onclick="alert('4/16 발신번호 등록제 시행에 따라 등록된 전화번호로만 발송이 가능합니다.\n발신번호선택 버튼을 눌러 등록해 주세요.'); jQuery('.btn_show_layer', '#smsMessage .right_button').trigger('click');" />
+				<button class="btn_show_layer" title="발신번호선택">발신번호선택</button>
 			</div>
 			<div class="submit_btn">
 				<a id="pb_preview_button" href="" class="btn_booking">미리보기</a>

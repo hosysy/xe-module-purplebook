@@ -350,25 +350,7 @@
 		 * 발신번호관리창 레이어
 		 */
 		$('.btn_show_layer','#smsMessage .right_button').click(function() {
-			var params = new Array();
-			var response_tags = new Array('error','message','data');
-
-			params['g_mid'] = g_mid;
-			params['layer_name'] = 'layer_sendid';
-
-			layer_id = '#layer_sendid';
-
-			exec_xml('purplebook', 'getPopupLayer', params, function(ret_obj) {
-				if (ret_obj["data"]) {
-					jQuery(layer_id).html(ret_obj["data"]);
-					if (jQuery(layer_id).css('display') == 'block') jQuery(layer_id).html('');
-
-					$obj = jQuery(layer_id);
-					
-					show_and_hide($obj, null, {show_func:refreshCallbackList});
-				}
-			}, response_tags);
-
+			popup_layer('layer_sendid', '#layer_sendid');
 			return false;
 		});
 
@@ -462,6 +444,7 @@
 		 * 발신번호관리
 		 */
 		layer_popup_set('#layer_sendid', '<div id="layer_sendid" class="layer draggable"></div>', '.btn_show_layer', '#smsMessage .right_button');
+		layer_popup_set('#layer_senderid_verification', '<div id="layer_senderid_verification" class="layer draggable"></div>', '#pb_result_button', '#smsMessage .right_button');
 
 		/**
 		 * 예약발송
@@ -664,3 +647,25 @@ function popup_fullscreen_layer(layer_name, layer_selector) {
 		}
 	}, response_tags);
 }
+
+/**
+ * popup layer
+ */
+function popup_layer(layer_name, layer_selector, func) {
+	var params = new Array();
+	var response_tags = new Array('error','message','data');
+
+	params['g_mid'] = g_mid;
+	params['layer_name'] = layer_name;
+
+	exec_xml('purplebook', 'getPopupLayer', params, function(ret_obj) {
+		if (ret_obj["data"]) {
+			jQuery(layer_selector).html(ret_obj["data"]);
+			if (jQuery(layer_id).css('display') == 'block') jQuery(layer_id).html('');
+			$obj = jQuery(layer_selector);
+			show_and_hide($obj, null, {show_func:refreshCallbackList});
+			if (typeof(func) != 'undefined') func.call();
+		}
+	}, response_tags);
+}
+

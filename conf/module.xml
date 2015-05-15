@@ -37,6 +37,8 @@
 		<action name="getPurplebookPreview" type="model" />
 		<action name="getPurplebookListCount" type="model" />
 		<action name="getPurplebookListByNodeRoute" type="model" />
+		<action name="getPurplebookSenderIDVerificationInfo" type="model" />
+		<action name="getPurplebookSenderIDs" type="model" />
 		<action name="getPopupLayer" type="model" />
 
 		<action name="procPurplebookSendMsg" type="controller" standalone="true" />
@@ -65,5 +67,8 @@
 		<action name="procPurplebookDelete" type="controller" stradalone="true" />
 		<action name="procPurplebookUpdate" type="controller" stradalone="true" />
 		<action name="procPurplebookCancelMsg" type="controller" stradalone="true" />
+		<action name="procPurplebookRegisterSenderID" type="controller" stradalone="true" />
+		<action name="procPurplebookSetDefaultSenderID" type="controller" stradalone="true" />
+		<action name="procPurplebookDeleteSenderID" type="controller" stradalone="true" />
 	</actions>
 </module>

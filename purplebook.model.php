@@ -1061,6 +1061,88 @@ class purplebookModel extends purplebook
 		}
 		return $result;
 	}
+
+	/**
+	 * return sender-id verification info.(transaction_id, ars_number)
+	 */
+	function getPurplebookSenderIDVerificationInfo()
+	{
+		$logged_info = Context::get('logged_info');
+
+		$oTextmessageModel = &getModel('textmessage');
+		$config = $oTextmessageModel->getModuleConfig();
+
+		$phone_number = Context::get('phone_number');
+
+		$parameters['api_key'] = $config->api_key;
+		$parameters['salt'] = uniqid();
+		$parameters['timestamp'] = strval(time());
+		$parameters['User_Agent'] = 'RestTool';
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters['site_user'] = $logged_info->user_id;
+		$parameters['phone'] = $phone_number;
+		
+		$query_string = "/senderid/1/register";
+		//$query_string = sprintf("/senderid/1/verification_code?%s", http_build_query($parameters));
+		/*
+		$oTextmessageController = &getController('textmessage');
+		$output = $oTextmessageController->verifySenderID($phone_number);
+		$transaction_id = $output->get('transaction_id');
+		 */
+		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$output = $http->send($query_string, 'POST', 10, $parameters);
+		if(is_a($output, 'Object')) return $output;
+		debugPrint('senderIdVerficationInfo');
+		debugPrint($output);
+		$result = json_decode($output->body);
+		$this->add('handle_key', $result->handle_key);
+		$this->add('ars_number', $result->ars_number);
+	}
+
+	function getPurplebookSenderIDs()
+	{
+		$logged_info = Context::get('logged_info');
+
+		$oTextmessageModel = &getModel('textmessage');
+		$config = $oTextmessageModel->getModuleConfig();
+
+		$parameters['api_key'] = $config->api_key;
+		$parameters['salt'] = uniqid();
+		$parameters['timestamp'] = strval(time());
+		$parameters['User_Agent'] = 'RestTool';
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters['site_user'] = $logged_info->user_id;
+		
+		$query_string = "/senderid/1/list?" . http_build_query($parameters);
+		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$output = $http->send($query_string, 'GET', 10, $parameters);
+		if(is_a($output, 'Object')) return $output;
+		$result = json_decode($output->body);
+		$this->add('data', $result);
+	}
+
+	function getDefaultSenderID($user_id)
+	{
+		$oTextmessageModel = &getModel('textmessage');
+		$config = $oTextmessageModel->getModuleConfig();
+
+		$parameters['api_key'] = $config->api_key;
+		$parameters['salt'] = uniqid();
+		$parameters['timestamp'] = strval(time());
+		$parameters['User_Agent'] = 'RestTool';
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters['site_user'] = $user_id;
+		
+		$query_string = "/senderid/1/get_default?" . http_build_query($parameters);
+		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$output = $http->send($query_string, 'GET', 10, $parameters);
+		if(is_a($output, 'Object')) return $output;
+		$result = json_decode($output->body);
+		return $result->phone_number;
+	}
 }
 /* End of file purplebook.model.php */
 /* Location: ./modules/purplebook/purplebook.model.php */

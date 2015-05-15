@@ -1063,6 +1063,30 @@ class purplebookController extends purplebook
 		$this->setMessage('msg_folder_unshared');
 	}
 
+	function procPurplebookRegisterSenderID()
+	{
+		$oTextmessageModel = &getModel('textmessage');
+		$config = $oTextmessageModel->getModuleConfig();
+
+		$parameters['api_key'] = $config->api_key;
+		$parameters['salt'] = uniqid();
+		$parameters['timestamp'] = strval(time());
+		$parameters['User_Agent'] = 'RestTool';
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters['handle_key'] = Context::get('handle_key');
+		
+		$query_string = "/senderid/1/verify";
+		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$output = $http->send($query_string, 'POST', 10, $parameters);
+		if(is_a($output, 'Object')) return $output;
+		debugPrint('senderIdRegister');
+		debugPrint($output);
+		$result = json_decode($output->body);
+		$this->add('code', $result->code);
+		$this->add('message', $result->message);
+	}
+
 	/**
 	 * 발신번호 저장
 	 */
@@ -1118,6 +1142,65 @@ class purplebookController extends purplebook
 		$args->flag_default = 'Y';
 		$output = executeQuery('purplebook.updateCallbackNumber', $args);
 		return $output;
+	}
+
+	/**
+	 * set default sender-id
+	 */
+	function procPurplebookSetDefaultSenderID() 
+	{
+		$logged_info = Context::get('logged_info');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
+
+		$phonenum = preg_replace("/[^0-9]/", "", Context::get('phonenum'));
+
+		$oTextmessageModel = &getModel('textmessage');
+		$config = $oTextmessageModel->getModuleConfig();
+
+		$parameters['api_key'] = $config->api_key;
+		$parameters['salt'] = uniqid();
+		$parameters['timestamp'] = strval(time());
+		$parameters['User_Agent'] = 'RestTool';
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters['handle_key'] = Context::get('handle_key');
+		$parameters['site_user'] = $logged_info->user_id;
+		
+		$query_string = "/senderid/1/set_default";
+		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$output = $http->send($query_string, 'POST', 10, $parameters);
+		if(is_a($output, 'Object')) return $output;
+		$result = json_decode($output->body);
+		$this->add('code', $result->code);
+		$this->add('message', $result->message);
+	}
+
+	/**
+	 * set default sender-id
+	 */
+	function procPurplebookDeleteSenderID() 
+	{
+		$logged_info = Context::get('logged_info');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
+
+		$oTextmessageModel = &getModel('textmessage');
+		$config = $oTextmessageModel->getModuleConfig();
+
+		$parameters['api_key'] = $config->api_key;
+		$parameters['salt'] = uniqid();
+		$parameters['timestamp'] = strval(time());
+		$parameters['User_Agent'] = 'RestTool';
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters['handle_key'] = Context::get('handle_key');
+		
+		$query_string = "/senderid/1/delete";
+		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$output = $http->send($query_string, 'POST', 10, $parameters);
+		if(is_a($output, 'Object')) return $output;
+		$result = json_decode($output->body);
+		$this->add('code', $result->code);
+		$this->add('message', $result->message);
 	}
 
 	/**
