@@ -22,7 +22,7 @@ class purplebookView extends purplebook
 	/**
 	 * purplebook 기본화면
 	 */
-	function dispPurplebookIndex()
+	function dispPurplebookIndex($basecamp = FALSE)
 	{
 		global $lang;
 
@@ -40,7 +40,7 @@ class purplebookView extends purplebook
 		if($logged_info)
 		{
 			$oPurplebookModel = &getModel('purplebook');
-			$callback = $oPurplebookModel->getDefaultSenderID($logged_info->user_id);
+			$callback = $oPurplebookModel->getDefaultSenderID($logged_info->user_id, $basecamp);
 			Context::set('callback', $callback);
 		}
 

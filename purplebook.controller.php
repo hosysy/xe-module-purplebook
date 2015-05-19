@@ -1063,28 +1063,47 @@ class purplebookController extends purplebook
 		$this->setMessage('msg_folder_unshared');
 	}
 
-	function procPurplebookRegisterSenderID()
+	function sendApiRequest($resource, $parameters, $method, $basecamp = FALSE)
 	{
 		$oTextmessageModel = &getModel('textmessage');
 		$config = $oTextmessageModel->getModuleConfig();
 
-		$parameters['api_key'] = $config->api_key;
+		if($basecamp)
+		{
+			$parameters['coolsms_user'] = $config->cs_user_id;
+			$api_secret = $config->cs_password;
+		}
+		else
+		{
+			$parameters['api_key'] = $config->api_key;
+			$api_secret = $config->api_secret;
+		}
 		$parameters['salt'] = uniqid();
 		$parameters['timestamp'] = strval(time());
 		$parameters['User_Agent'] = 'RestTool';
-		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
-		$parameters['handle_key'] = Context::get('handle_key');
+		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $api_secret);
+		//$parameters['handle_key'] = Context::get('handle_key');
 		
-		$query_string = "/senderid/1/verify";
+		$query_string = sprintf("/senderid/1/%s", $resource);
+		if($method == 'GET') $query_string = sprintf("%s?%s", $query_string, http_build_query($parameters));
 		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
 		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
-		$output = $http->send($query_string, 'POST', 10, $parameters);
-		if(is_a($output, 'Object')) return $output;
-		debugPrint('senderIdRegister');
-		debugPrint($output);
-		$result = json_decode($output->body);
-		$this->add('code', $result->code);
-		$this->add('message', $result->message);
+		$result = $http->send($query_string, $method, 10, $parameters);
+		if(is_a($result, 'Object')) return $result;
+		$output = new Object();
+		$output->data = json_decode($result->body);
+		return $output;
+	}
+
+	function procPurplebookRegisterSenderID($basecamp = FALSE)
+	{
+		$parameters = array();
+		$parameters['handle_key'] = Context::get('handle_key');
+
+		$oPurplebookController = &getController('purplebook');
+		$output = $oPurplebookController->sendApiRequest('verify', $parameters, 'POST', $basecamp);
+		$this->add('code', $output->data->code);
+		$this->add('message', $output->data->message);
 	}
 
 	/**
@@ -1147,60 +1166,38 @@ class purplebookController extends purplebook
 	/**
 	 * set default sender-id
 	 */
-	function procPurplebookSetDefaultSenderID() 
+	function procPurplebookSetDefaultSenderID($basecamp = FALSE) 
 	{
 		$logged_info = Context::get('logged_info');
 		if(!$logged_info) return new Object(-1, 'msg_login_required');
 
-		$phonenum = preg_replace("/[^0-9]/", "", Context::get('phonenum'));
-
-		$oTextmessageModel = &getModel('textmessage');
-		$config = $oTextmessageModel->getModuleConfig();
-
-		$parameters['api_key'] = $config->api_key;
-		$parameters['salt'] = uniqid();
-		$parameters['timestamp'] = strval(time());
-		$parameters['User_Agent'] = 'RestTool';
-		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
+		$parameters = array();
+		if(!$basecamp) $parameters['site_user'] = $user_id;
 		$parameters['handle_key'] = Context::get('handle_key');
-		$parameters['site_user'] = $logged_info->user_id;
-		
-		$query_string = "/senderid/1/set_default";
-		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
-		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
-		$output = $http->send($query_string, 'POST', 10, $parameters);
-		if(is_a($output, 'Object')) return $output;
-		$result = json_decode($output->body);
-		$this->add('code', $result->code);
-		$this->add('message', $result->message);
+
+		$oPurplebookController = &getController('purplebook');
+		$output = $oPurplebookController->sendApiRequest('set_default', $parameters, 'POST', $basecamp);
+		$this->add('code', $output->data->code);
+		$this->add('message', $output->data->message);
 	}
 
 	/**
 	 * set default sender-id
 	 */
-	function procPurplebookDeleteSenderID() 
+	function procPurplebookDeleteSenderID($basecamp = FALSE) 
 	{
 		$logged_info = Context::get('logged_info');
 		if(!$logged_info) return new Object(-1, 'msg_login_required');
 
-		$oTextmessageModel = &getModel('textmessage');
-		$config = $oTextmessageModel->getModuleConfig();
-
-		$parameters['api_key'] = $config->api_key;
-		$parameters['salt'] = uniqid();
-		$parameters['timestamp'] = strval(time());
-		$parameters['User_Agent'] = 'RestTool';
-		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
 		$parameters['handle_key'] = Context::get('handle_key');
-		
-		$query_string = "/senderid/1/delete";
-		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
-		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
-		$output = $http->send($query_string, 'POST', 10, $parameters);
-		if(is_a($output, 'Object')) return $output;
-		$result = json_decode($output->body);
-		$this->add('code', $result->code);
-		$this->add('message', $result->message);
+
+		$parameters = array();
+		if(!$basecamp) $parameters['site_user'] = $logged_info->user_id;
+
+		$oPurplebookController = &getController('purplebook');
+		$output = $oPurplebookController->sendApiRequest('delete', $parameters, 'POST', $basecamp);
+		$this->add('code', $output->data->code);
+		$this->add('message', $output->data->message);
 	}
 
 	/**
