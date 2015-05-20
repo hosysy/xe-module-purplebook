@@ -1100,10 +1100,14 @@ class purplebookController extends purplebook
 		$parameters = array();
 		$parameters['handle_key'] = Context::get('handle_key');
 
-		$oPurplebookController = &getController('purplebook');
-		$output = $oPurplebookController->sendApiRequest('verify', $parameters, 'POST', $basecamp);
-		$this->add('code', $output->data->code);
-		$this->add('message', $output->data->message);
+		$output = $this->sendApiRequest('verify', $parameters, 'POST', $basecamp);
+		if(!$output->toBool()) return $output;
+		if($output->data->code)
+		{
+			$this->setError(-1);
+			$this->setMessage(sprintf("올바르게 인증되지 않았습니다. 다시 시도해 주세요\n%s", $output->data->message));
+			//$this->add('code', $output->data->code);
+		}
 	}
 
 	/**
