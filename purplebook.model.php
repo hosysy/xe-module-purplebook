@@ -1076,8 +1076,6 @@ class purplebookModel extends purplebook
 		$oPurplebookController = &getController('purplebook');
 		$output = $oPurplebookController->sendApiRequest('register', $parameters, 'POST', $basecamp);
 		if(!$output->toBool()) return $output;
-		debugPrint('IDVerificationInfo');
-		debugPrint($output);
 		$this->add('handle_key', $output->data->handle_key);
 		$this->add('ars_number', $output->data->ars_number);
 	}
@@ -1104,25 +1102,6 @@ class purplebookModel extends purplebook
 		$output = $oPurplebookController->sendApiRequest('get_default', $parameters, 'GET', $basecamp);
 		if(!$output->toBool()) return $output;
 		return $output->data->phone_number;
-		/*
-		$oTextmessageModel = &getModel('textmessage');
-		$config = $oTextmessageModel->getModuleConfig();
-
-		$parameters['api_key'] = $config->api_key;
-		$parameters['salt'] = uniqid();
-		$parameters['timestamp'] = strval(time());
-		$parameters['User_Agent'] = 'RestTool';
-		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $config->api_secret);
-		$parameters['site_user'] = $user_id;
-		
-		$query_string = "/senderid/1/get_default?" . http_build_query($parameters);
-		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
-		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
-		$output = $http->send($query_string, 'GET', 10, $parameters);
-		if(is_a($output, 'Object')) return $output;
-		$result = json_decode($output->body);
-		return $result->phone_number;
-		 */
 	}
 }
 /* End of file purplebook.model.php */

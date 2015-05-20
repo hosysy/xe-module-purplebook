@@ -51,7 +51,7 @@ if (!sendid_javascript_permission) {
 		$(document).on('click', '#smsPurplebookButtonAddCallback', function() {
 			var params = new Array();
 			params['phone_number'] = $('#smsPurplebookInputCallback').val();
-			var response_tags = new Array('error','message','handle_key', 'ars_number');
+			var response_tags = new Array('error', 'message', 'handle_key', 'ars_number');
 			exec_xml('purplebook', 'getPurplebookSenderIDVerificationInfo', params, function(ret_obj) {
 				if (ret_obj['handle_key']) {
 					var ars_number = ret_obj['ars_number'];
