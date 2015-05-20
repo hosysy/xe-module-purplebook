@@ -44,7 +44,7 @@ function get_click_direction() {
 	var direction = localStorage.getItem('click_direction');
 
 	// not in 'left' and 'right'
-	if (['left', 'right'].indexOf(direction) == -1) return 'left';
+	if (direction != 'left' && direction != 'right') return 'left';
 
 	return direction;
 }
