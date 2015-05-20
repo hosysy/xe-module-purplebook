@@ -39,8 +39,9 @@ if (!sendid_javascript_permission) {
 		 * .default 클릭시
 		 */
 		$(document).on('click', '#smsPurplebookCallbackList .default', function() {
+			var handle_key = $(this).parent().attr('callback_srl');
 			var phonenum = $('.phonenum',$(this).parent()).text();
-			request_default_number(phonenum);
+			request_default_number(handle_key);
 			$('#smsPurplebookCallback').val(phonenum).select();
 		});
 
@@ -49,14 +50,33 @@ if (!sendid_javascript_permission) {
 		 */
 		$(document).on('click', '#smsPurplebookButtonAddCallback', function() {
 			var params = new Array();
+			params['phone_number'] = $('#smsPurplebookInputCallback').val();
+			var response_tags = new Array('error','message','handle_key', 'ars_number');
+			exec_xml('purplebook', 'getPurplebookSenderIDVerificationInfo', params, function(ret_obj) {
+				if (ret_obj['handle_key']) {
+					var ars_number = ret_obj['ars_number'];
+					var handle_key = ret_obj['handle_key'];
+					popup_layer('layer_senderid_verification', '#layer_senderid_verification', function() {
+						$('#ars_number').text(ars_number);
+						$('#verify_ars_response').attr('data-handle_key', handle_key);
+					});
+				}
+			}, response_tags);
+			return false;
+		});
+		/*
+		$(document).on('click', '#smsPurplebookButtonAddCallback', function() {
+			var params = new Array();
 			params['phonenum'] = $('#smsPurplebookInputCallback').val();
 			var response_tags = new Array('error','message');
 			exec_xml('purplebook', 'procPurplebookSaveCallbackNumber', params, function() {
+				//popup_layer('layer_senderid_verification', '#layer_senderid_verification');
 			   refreshCallbackList();
 			   $('#smsPurplebookInputCallback').val('');
 			}, response_tags);
 			return false;
 		});
+		*/
 	});
 }) (jQuery);
 
@@ -66,13 +86,13 @@ if (!sendid_javascript_permission) {
 function refreshCallbackList() {
 	var params = new Array();
 	var response_tags = new Array('error','message','data');
-	exec_xml('purplebook', 'getPurplebookCallbackNumbers', params, completeGetCallbackList, response_tags);
+	exec_xml('purplebook', 'getPurplebookSenderIDs', params, completeGetCallbackList, response_tags);
 }
 
 function completeGetCallbackList(ret_obj, response_tags) {
 	$list = jQuery('#smsPurplebookCallbackList').empty();
-	if (ret_obj['data']) {
-		var data = ret_obj['data']['item'];
+	if (ret_obj['data']['data']) {
+		var data = ret_obj['data']['data']['item'];
 		if (!jQuery.isArray(data)) {
 			data = new Array(data);
 		}
@@ -82,7 +102,7 @@ function completeGetCallbackList(ret_obj, response_tags) {
 			} else {
 				on = '';
 			}
-			$list.append('<li callback_srl="' + data[i].callback_srl + '"><span class="default' + on + '"></span><span class="phonenum">' + data[i].phonenum + '</span><span class="deleteCallback" title="삭제">삭제</span></li>');
+			$list.append('<li callback_srl="' + data[i].idno + '"><span class="default' + on + '"></span><span class="phonenum">' + data[i].phone_number + '</span><span class="deleteCallback" title="삭제">삭제</span></li>');
 		}
 	}
 }
@@ -92,14 +112,14 @@ function completeGetCallbackList(ret_obj, response_tags) {
  */
 function deleteCallback(callback_srl) {
 	var params = new Array();
-	params['callback_srl'] = callback_srl;
+	params['handle_key'] = callback_srl;
 	var response_tags = new Array('error','message');
-	exec_xml('purplebook', 'procPurplebookDeleteCallbackNumber', params, function() { refreshCallbackList(); }, response_tags);
+	exec_xml('purplebook', 'procPurplebookDeleteSenderID', params, function() { refreshCallbackList(); }, response_tags);
 }
 
-function request_default_number(phonenum) {
+function request_default_number(handle_key) {
 	var params = new Array();
-	params['phonenum'] = phonenum;
+	params['handle_key'] = handle_key;
 	var response_tags = new Array('error','message');
-	exec_xml('purplebook', 'procPurplebookSetDefaultCallbackNumber', params, function() { refreshCallbackList(); }, response_tags);
+	exec_xml('purplebook', 'procPurplebookSetDefaultSenderID', params, function() { refreshCallbackList(); }, response_tags);
 }
