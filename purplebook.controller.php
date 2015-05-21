@@ -1092,6 +1092,11 @@ class purplebookController extends purplebook
 		if(is_a($result, 'Object')) return $result;
 		$output = new Object();
 		$output->data = json_decode($result->body);
+		if($output->data->code)
+		{
+			$output->setError(-1);
+			$output->setMessage(sprintf("%s : %s", $output->data->code, $output->data->message));
+		}
 		return $output;
 	}
 

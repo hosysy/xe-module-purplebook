@@ -41,7 +41,7 @@ class purplebookView extends purplebook
 		{
 			$oPurplebookModel = &getModel('purplebook');
 			$callback = $oPurplebookModel->getDefaultSenderID($logged_info->user_id, $basecamp);
-			Context::set('callback', $callback);
+			if(is_string($callback)) Context::set('callback', $callback);
 		}
 
 		$this->setTemplateFile('address');
