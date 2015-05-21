@@ -19,6 +19,8 @@ if (!sendid_javascript_permission) {
 			return;
 		}
 
+		jQuery('input','#layer_sendid').filter(function(index){ return !jQuery(this).hasClass('help'); }).tipsy();
+
 		/**
 		 * 발신번호 delete
 		 */
