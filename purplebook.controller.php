@@ -1198,10 +1198,9 @@ class purplebookController extends purplebook
 		$logged_info = Context::get('logged_info');
 		if(!$logged_info) return new Object(-1, 'msg_login_required');
 
-		$parameters['handle_key'] = Context::get('handle_key');
-
 		$parameters = array();
 		if(!$basecamp) $parameters['site_user'] = $logged_info->user_id;
+		$parameters['handle_key'] = Context::get('handle_key');
 
 		$oPurplebookController = &getController('purplebook');
 		$output = $oPurplebookController->sendApiRequest('delete', $parameters, 'POST', $basecamp);
