@@ -1086,7 +1086,7 @@ class purplebookController extends purplebook
 		
 		$query_string = sprintf("/senderid/1/%s", $resource);
 		if($method == 'GET') $query_string = sprintf("%s?%s", $query_string, http_build_query($parameters));
-		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		require_once(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
 		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
 		$result = $http->send($query_string, $method, 10, $parameters);
 		if(is_a($result, 'Object')) return $result;

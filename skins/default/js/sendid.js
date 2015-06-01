@@ -66,19 +66,6 @@ if (!sendid_javascript_permission) {
 			}, response_tags);
 			return false;
 		});
-		/*
-		$(document).on('click', '#smsPurplebookButtonAddCallback', function() {
-			var params = new Array();
-			params['phonenum'] = $('#smsPurplebookInputCallback').val();
-			var response_tags = new Array('error','message');
-			exec_xml('purplebook', 'procPurplebookSaveCallbackNumber', params, function() {
-				//popup_layer('layer_senderid_verification', '#layer_senderid_verification');
-			   refreshCallbackList();
-			   $('#smsPurplebookInputCallback').val('');
-			}, response_tags);
-			return false;
-		});
-		*/
 	});
 }) (jQuery);
 
