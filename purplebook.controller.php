@@ -1088,7 +1088,7 @@ class purplebookController extends purplebook
 		
 		$query_string = sprintf("/senderid/1/%s", $resource);
 		if($method == 'GET') $query_string = sprintf("%s?%s", $query_string, http_build_query($parameters));
-		require(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
+		require_once(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
 		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
 		$result = $http->send($query_string, $method, 10, $parameters);
 		if(is_a($result, 'Object')) return $result;
@@ -1108,12 +1108,21 @@ class purplebookController extends purplebook
 		$parameters['handle_key'] = Context::get('handle_key');
 
 		$output = $this->sendApiRequest('verify', $parameters, 'POST', $basecamp);
-		if(!$output->toBool()) return $output;
-		if($output->data->code)
+		if(!$output->toBool())
 		{
 			$this->setError(-1);
-			$this->setMessage(sprintf("올바르게 인증되지 않았습니다. 다시 시도해 주세요\n%s", $output->data->message));
-			//$this->add('code', $output->data->code);
+			switch($output->data->code)
+			{
+				case 'Timeout':
+					$this->setMessage(sprintf("시간이 경과되었습니다. 처음부터 다시 시도해 주세요.\n%s", $output->data->message));
+					break;
+				case 'Busy':
+					$this->setMessage(sprintf("입력하신 전화번호의 전화기로 전화를 걸어주세요.\n이미 전화를 거셨다면, 입력하신 전화반호와 실제 발신번호가 일치하지 않습니다.\n%s", $output->data->message));
+					break;
+				default:
+					$this->setMessage(sprintf("인증실패! 운영자에게 문의바랍니다.\n%s", $output->data->message));
+					break;
+			}
 		}
 	}
 

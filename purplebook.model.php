@@ -1103,6 +1103,35 @@ class purplebookModel extends purplebook
 		if(!$output->toBool()) return $output;
 		return $output->data->phone_number;
 	}
+
+	function getPurplebookHint($basecamp = FALSE)
+	{
+			$oPurplebookController = &getController('purplebook');
+
+			$parameters = array();
+			$parameters['handle_key'] = Context::get('handle_key');
+
+			$output = $oPurplebookController->sendApiRequest('verify', $parameters, 'POST', $basecamp);
+			if(!$output->toBool())
+			{
+				switch($output->data->code)
+				{
+					case 'Timeout':
+						$this->add('result', 'timeout');
+						$this->setMessage(sprintf("시간이 경과되었습니다. 처음부터 다시 시도해 주세요.\n%s", $output->data->message));
+						break;
+				}
+			}
+			else
+			{
+				$this->add('result', 'verified');
+				$this->setMessage("등록되었습니다.");
+			}
+
+			$output = $oPurplebookController->sendApiRequest('hint', $parameters, 'GET', $basecamp);
+			if(!$output->toBool()) return $output;
+			$this->add('data', $output->data);
+	}
 }
 /* End of file purplebook.model.php */
 /* Location: ./modules/purplebook/purplebook.model.php */

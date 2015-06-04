@@ -39,6 +39,7 @@
 		<action name="getPurplebookListByNodeRoute" type="model" />
 		<action name="getPurplebookSenderIDVerificationInfo" type="model" />
 		<action name="getPurplebookSenderIDs" type="model" />
+		<action name="getPurplebookHint" type="model" />
 		<action name="getPopupLayer" type="model" />
 
 		<action name="procPurplebookSendMsg" type="controller" standalone="true" />

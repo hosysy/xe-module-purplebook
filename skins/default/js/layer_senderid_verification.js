@@ -8,8 +8,46 @@ if (!layer_senderid_verification_permission) {
 	var layer_senderid_verification_permission = false;
 }
 
+function checkHint() {
+	jQuery('#hint').show();
+	var params = new Array();
+	params['handle_key'] = jQuery('#verify_ars_response').attr('data-handle_key');
+	var response_tags = new Array('error','message','result','data');
+	jQuery('#hint-content').html('');
+	exec_xml('purplebook', 'getPurplebookHint', params, function(ret_obj) {
+		if (ret_obj['result']) {
+			show_and_hide(jQuery('#layer_senderid_verification'));
+			alert(ret_obj['message']);
+			switch (ret_obj['result']) {
+				case 'verified':
+					refreshCallbackList();
+					break;
+				case 'timeout':
+					break;
+			}
+			return;
+		}
+		if (ret_obj['data']) {
+			jQuery('#instruction').text('혹시 아래 전화번호로 거셨나요?');
+			var data = ret_obj['data']['item'];
+			if (!jQuery.isArray(data)) {
+				data = new Array(data);
+			}
+			for (var i = 0; i < data.length; i++) {
+				jQuery('#hint-content').append(data[i]+"<br />");
+			}
+			setTimeout(checkHint, 10000);
+		} else {
+			jQuery('#instruction').text('어서 전화를 걸어주세요.');
+			setTimeout(checkHint, 10000);
+		}
+	}, response_tags);
+}
+
 (function($) {
 	jQuery(function($) {
+		setTimeout(checkHint, 10000);
+
 		/**
 		 * js file이 한번만 로딩되도록
 		 */
@@ -24,7 +62,7 @@ if (!layer_senderid_verification_permission) {
 			params['handle_key'] = $(this).attr('data-handle_key');
 			var response_tags = new Array('error','message');
 			exec_xml('purplebook', 'procPurplebookRegisterSenderID', params, function(ret_obj) {
-				$('#layer_senderid_verification').html('');
+				show_and_hide(jQuery('#layer_senderid_verification'));
 				alert(ret_obj['message']);
 				refreshCallbackList();
 			}, response_tags);
