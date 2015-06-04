@@ -146,17 +146,19 @@ class purplebookController extends purplebook
 					$output=executeQuery('purplebook.getPurplebook', $vars);
 					if(!$output->toBool()) return $output;
 
-					$merge_name = $row->refname;
 					$merge_memo1 = $output->data->memo1;
 					$merge_memo2 = $output->data->memo2;
 					$merge_memo3 = $output->data->memo3;
 				}
 
-				$merge = array('{name}', '{memo1}', '{memo2}', '{memo3}');
-				$change_string = array($merge_name, $merge_memo1, $merge_memo2, $merge_memo3);
+				$merge = array('{memo1}', '{memo2}', '{memo3}');
+				$change_string = array($merge_memo1, $merge_memo2, $merge_memo3);
 
 				$row->text = str_replace($merge, $change_string, $row->text);
 			}
+
+			// 이름 같은 경우는 항상 들어가기 때문에 text안에 {name}이 있을경우 바꿔준다.
+			if(strpos($row->text, '{name}') !== false) $row->text = str_replace('{name}', $row->refname, $row->text);
 
 			// set arggument
 			$args->type = $row->msgtype;
