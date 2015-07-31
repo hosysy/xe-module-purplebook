@@ -8,6 +8,7 @@ class purplebookModel extends purplebook
 {
 	function init()
 	{
+
 	}
 
 	/**
