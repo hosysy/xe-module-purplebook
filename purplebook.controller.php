@@ -187,6 +187,7 @@ class purplebookController extends purplebook
 
 		// 발송루트 추가 
 		$args->route = "Purplebook";
+		$args->app_version = "Purplebook 4.3";
 
 		// 메시지 갯수가 limit을 넘긴다면
 		if(count($extension) > 1000) 
