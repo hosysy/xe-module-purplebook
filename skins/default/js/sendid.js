@@ -59,7 +59,7 @@ if (!sendid_javascript_permission) {
 					var ars_number = ret_obj['ars_number'];
 					var handle_key = ret_obj['handle_key'];
 					popup_layer('layer_senderid_verification', '#layer_senderid_verification', function() {
-						$('#ars_number').text(ars_number);
+						$('#ars_number').text(ars_number.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'));
 						$('#verify_ars_response').attr('data-handle_key', handle_key);
 					});
 				}
