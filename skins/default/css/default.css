@@ -404,3 +404,6 @@ span.total { margin-bottom:3px; color:#999; }
 /* pop_message */
 #pb_pop_message { padding:10px; background:#333; color:#fff; }
 #pb_pop_message:after { border:solid transparent; border-color:transparent; border-width:5px; position:absolute; left:-5px; top:12px; border-left:0; border-right-color:#333; width:0; height:0; content:""; }
+
+/* pb_block_senders_number */
+.pb_container .pb_block_senders_number { position:absolute; bottom:3px; margin-left:28px; font-size:8pt; }
