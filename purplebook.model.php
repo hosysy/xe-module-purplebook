@@ -8,7 +8,6 @@ class purplebookModel extends purplebook
 {
 	function init()
 	{
-
 	}
 
 	/**
@@ -358,6 +357,7 @@ class purplebookModel extends purplebook
 
 		if(Context::get('view_all')){
 			Context::set('list', $data); // 주소록 리스트 설정 
+			Context::set('node_route', $node_route);
 
 			if(Context::get('fix_mode')) Context::set('fix_mode', Context::get('fix_mode')); // 수정모드일때 
 
@@ -1132,6 +1132,35 @@ class purplebookModel extends purplebook
 			$output = $oPurplebookController->sendApiRequest('hint', $parameters, 'GET', $basecamp);
 			if(!$output->toBool()) return $output;
 			$this->add('data', $output->data);
+	}
+
+	/**
+	 * vcf 파일 데이터 읽어오기
+	 */
+	function getVcCardData(vCard $vCard)
+	{
+		$result = array();
+		foreach($vCard->n as $name)
+		{
+			$name = $name['LastName'] . $name['FirstName'];
+		}
+
+		if(!$vCard->tel) return $result;
+
+		foreach($vCard->tel as $tel)
+		{
+			if(is_scalar($tel))
+			{
+				$telnum = $tel;
+				continue;
+			}
+			$telnum = $tel['Value'];
+		}
+
+		$result['name'] = $name;
+		$result['number'] = $telnum;
+
+		return $result;
 	}
 }
 /* End of file purplebook.model.php */

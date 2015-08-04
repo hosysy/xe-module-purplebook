@@ -11,6 +11,7 @@
 					<!-- 주소록에 회원 추가 -->
 					<button onClick="pb_address_menu('#pb_add_address_direct')" class="gray_btn add_button individual_add">개별추가</button> <!-- 개별추가 버튼 -->
 					<button onClick="pb_address_menu('#pb_add_address_excel')" class="gray_btn add_button excel_add">엑셀추가</button> <!-- 엑셀추가 버튼 -->
+					<button onClick="pb_address_menu('#pb_add_address_vcf')" class="gray_btn add_button vcf_add">휴대폰주소록추가</button> <!-- 휴대폰주소록추가 버튼 -->
 					<button class="gray_btn add_button" onClick="pb_load_address(null, true)" id="pb_fix_mode_open">전체수정모드</button> <!-- 전체수정 모드 버튼 -->
 					<button class="gray_btn add_button" onClick="pb_load_address(null, false)" id="pb_fix_mode_close" style="display:none;">전체수정모드 종료</button> <!-- 전체수정 모드 종료 버튼 -->
 					<button class="gray_btn add_button" onClick="pb_save_address()" id="pb_fix_mode_save" style="display:none;">저장</button> <!-- 전체수정 모드 저장 버튼 -->
@@ -46,6 +47,7 @@
 				<form id="add_address_excel_form" enctype="multipart/form-data" method="POST" action="./" class="find">
 					<input name="module" type="hidden" value="{$module}" />
 					<input name="act" type="hidden" value="procPurplebookExcelLoad" />
+					<span>지원파일 : xls, xlsx</span>
 					<input type="file" id="inputFullAddressExcel" name="excel_file" />
 					<input type="hidden" id="excel_parent_node" name="parent_node" value="" />
 					<input type="hidden" id="excel_node_id" name="node_id" value="" />
@@ -54,7 +56,24 @@
 					<input type="submit" id="btnAddFullAddressExcel" value="등록" class="excel_submit" />
 				</form>
 				<span id="excel_loading_box">Wating...<img src="img/loading_icon.gif" alt="잠시만 기다려주세요." /></span>
-				<span><a href="http://www.coolsms.co.kr/Man_Sending_On_Web#toc-25" class="view_close_btn" target="_blank">사용방법</a></span>
+				<span><a href="http://www.coolsms.co.kr/Man_Sending_On_Web#toc-25" class="view_close_btn way_of_use" target="_blank">사용방법</a></span>
+			</div>
+			<!-- 휴대폰주소록추가 -->
+			<div id="pb_add_address_vcf" class="pb_address_hide_menu">
+				<span class="btn_closex" onClick="closeFullMenu('#pb_add_address_vcf')"><a href="#" class="close_button">Close</a></span>
+				<form id="add_address_vcf_form" enctype="multipart/form-data" method="POST" action="./" class="find">
+					<input name="module" type="hidden" value="{$module}" />
+					<input name="act" type="hidden" value="procPurplebookVcfLoad" />
+					<span>지원파일 : vcf</span>
+					<input type="file" id="inputFullAddressVcf" name="vcf_file" />
+					<input type="hidden" id="vcf_parent_node" name="parent_node" value="" />
+					<input type="hidden" id="vcf_node_id" name="node_id" value="" />
+					<input type="hidden" id="vcf_node_name" name="node_name" value="" />
+					<input type="hidden" id="vcf_node_type" name="node_type" value="" />
+					<input type="submit" id="btnAddFullAddressVcf" value="등록" class="excel_submit" />
+				</form>
+				<span id="vcf_loading_box">Wating...<img src="img/loading_icon.gif" alt="잠시만 기다려주세요." /></span>
+				<span><a href="http://www.coolsms.co.kr/Man_Sending_On_Web#toc-25" class="view_close_btn way_of_use" target="_blank">사용방법</a></span>
 			</div>
 			
 			<!-- 히스토리 -->

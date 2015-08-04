@@ -95,7 +95,6 @@ class purplebookAdminView extends purplebook
 
 		$this->setTemplateFile('grant_list');
 	}
-
 }
 /* End of file purplebook.admin.view.php */
 /* Location: ./modules/purplebook/purplebook.admin.view.php */
