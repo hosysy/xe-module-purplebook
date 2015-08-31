@@ -1079,6 +1079,7 @@ class purplebookModel extends purplebook
 		if(!$output->toBool()) return $output;
 		$this->add('handle_key', $output->data->handle_key);
 		$this->add('ars_number', $output->data->ars_number);
+		if(!$output->data->ars_number) return new Object(-1, '서버로부터 ars_number를 받아오지 못 했습니다. 잠시 후 다시시도 해주세요.');
 	}
 
 	function getPurplebookSenderIDs($basecamp = FALSE)
