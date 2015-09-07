@@ -11,6 +11,7 @@ span.tooltip {
     text-shadow: none;
     text-decoration: none;
 }
+.blue{background:#285fa4 ! important;}
 span.tooltip strong {line-height:30px;}
 span.tooltip:hover {text-decoration:none;} 
 span.tooltip span {
