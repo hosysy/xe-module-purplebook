@@ -642,8 +642,6 @@ class purplebookController extends purplebook
 		$ext = substr(strrchr($vars->excel_file["name"],"."),1); //확장자앞 .을 제거하기 위하여 substr()함수를 이용
 		$ext = strtolower($ext); //확장자를 소문자로 변환
 
-		debugPRInt($ext);
-
 		if($ext == null) return new Object(-1, 'msg_not_found_file'); // 파일 존재 여부 검사
 
 		$parent_node = Context::get('parent_node');
@@ -811,7 +809,7 @@ class purplebookController extends purplebook
 				$args->user_id = $logged_info->user_id;
 				$args->parent_node = $vars->parent_node;
 				$args->node_route = $node_route;
-				$args->node_name = $data['name'];
+				$args->node_name = iconv("EUC-KR", "UTF-8", $data['name']);
 				$args->node_type = '2';
 				$args->phone_num = str_replace('-', '', $data['number']);
 

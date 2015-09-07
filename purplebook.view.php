@@ -232,16 +232,17 @@ class purplebookView extends purplebook
 		$output = executeQuery('purplebook.getPurplebookList', $args);
 		if(!$output->toBool()) return $output;
 
-		require_once('vCard.php');
+		require_once('lib/vCard.php');
 
 		header('Content-Type: text/x-vcard');  
 		header('Content-Disposition: inline; filename= "address_list_' . date('Ymd') . '.vcf"');  
 		header('Content-Length: '.filesize($vCard));  
 
 		$vCard = new vCard;
+
 		foreach($output->data as $key=>$row)
 		{
-			$vCard->n($row->node_name, 'FirstName');
+			$vCard->n(iconv("UTF-8", "EUC-KR", $row->node_name), 'FirstName');
 			$vCard->tel($row->phone_num);
 			echo $vCard;
 		}
