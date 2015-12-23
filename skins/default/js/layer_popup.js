@@ -661,7 +661,6 @@ function popup_layer(layer_name, layer_selector, func) {
 	exec_xml('purplebook', 'getPopupLayer', params, function(ret_obj) {
 		if (ret_obj["data"]) {
 			jQuery(layer_selector).html(ret_obj["data"]);
-			if (jQuery(layer_id).css('display') == 'block') jQuery(layer_id).html('');
 			$obj = jQuery(layer_selector);
 			show_and_hide($obj, null, {show_func:refreshCallbackList});
 			if (typeof(func) != 'undefined') func.call();
