@@ -45,6 +45,30 @@ class purplebookView extends purplebook
 		}
 
 		$this->setTemplateFile('address');
+
+		if(!$logged_info || $logged_info->is_admin != 'Y') return;
+
+		$oMemberModel = &getModel('member');
+		$group_srl = Context::get('group_srl');
+		$cellphone_fieldname = Context::get('cellphone_fieldname');
+		if($group_srl)
+		{
+			$args->selected_group_srl = $group_srl;
+			$args->page = 1;
+			$args->list_count = 10000;
+			$args->page_count = 10;
+			$output = executeQueryArray('member.getMemberListWithinGroup', $args);
+			if(!$output->toBool()) return $output;
+			$member_list = $output->data;
+			foreach($member_list as $key => $member_info)
+			{
+				$extra_vars = unserialize($member_info->extra_vars);
+				$member_list[$key]->_purplebook->cellphone = is_array($extra_vars->{$cellphone_fieldname}) 
+					? implode($extra_vars->{$cellphone_fieldname}) 
+					: $extra_vars->{$cellphone_fieldname};
+			}
+		}
+		Context::set('member_list', $member_list);
 	}
 
 	/**

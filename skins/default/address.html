@@ -119,7 +119,15 @@
 				<button class="pop_recent" title="최근입력 번호목록">최근목록</button>
 			</div>
 			<div class="title_info"><span class="checkbox" id="smsPurplebookToggleTarget" title="선택전환"></span><span class="name">이름</span><span class="h_number">핸드폰</span><span class="h_delete">삭제</span></div>
-			<div class="bodyArea"><ul id="smsPurplebookTargetList"></ul></div>
+			<div class="bodyArea">
+				<ul id="smsPurplebookTargetList">
+					<li loop="$member_list => $key, $member_info" cond="$member_info->_purplebook->cellphone" id="tel{$member_info->_purplebook->cellphone}">
+						<span class="checkbox"></span>
+						<span class="name">{$member_info->nick_name}</span>
+						<span class="number">{$member_info->_purplebook->cellphone}</span>
+					</li>
+				</ul>
+			</div>
 			<ul class="bottomArea">
 				<li>
 					<a id="minusRecipients" href="#" title="선택삭제" onclick="return false;">선택삭제</a>
