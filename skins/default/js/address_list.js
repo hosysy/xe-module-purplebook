@@ -5,6 +5,9 @@
 
 (function($) {
 	jQuery(function($) {
+		// text scrolling
+		$('#newsList').newsTicker();
+
 		/**
 		 * selected address delete
 		 */

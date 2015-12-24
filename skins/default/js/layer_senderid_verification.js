@@ -38,7 +38,7 @@ function checkHint() {
 			}
 			setTimeout(checkHint, 10000);
 		} else {
-			jQuery('#instruction').text('어서 전화를 걸어주세요.');
+			jQuery('#instruction').text('전화요금은 무료입니다!');
 			setTimeout(checkHint, 10000);
 		}
 	}, response_tags);

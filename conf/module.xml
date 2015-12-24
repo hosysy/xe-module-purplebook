@@ -21,6 +21,8 @@
 		<!-- for member -->
 		<action name="dispPurplebookIndex" type="view" index="true" />
 		<action name="dispPurplebookFilePicker" type="view" />
+		<action name="dispPurplebookAddressDownload" type="view" />
+		<action name="dispPurplebookAddressVcfDownload" type="view" />
 
 		<action name="getPurplebookList" type="model" />
 		<action name="getPurplebookSearch" type="model" />
@@ -71,5 +73,6 @@
 		<action name="procPurplebookRegisterSenderID" type="controller" stradalone="true" />
 		<action name="procPurplebookSetDefaultSenderID" type="controller" stradalone="true" />
 		<action name="procPurplebookDeleteSenderID" type="controller" stradalone="true" />
+		<action name="procPurplebookVcfLoad" type="controller" stradalone="true" />
 	</actions>
 </module>

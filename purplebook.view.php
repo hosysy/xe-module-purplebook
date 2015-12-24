@@ -211,6 +211,96 @@ class purplebookView extends purplebook
 		$this->setLayoutFile('default_layout');
 		$this->setTemplateFile('filepicker');
 	}
+
+	/**
+	 * 주소록 vcf로 다운로드 
+	 */
+	function dispPurplebookAddressVcfDownload()
+	{
+		$oPurplebookModel = &getModel('purplebook');
+
+        $logged_info = Context::get('logged_info');
+        if(!$logged_info) return new Object(-1, 'msg_not_logged');
+
+		$node_route = Context::get('node_route');
+		if(!$node_route) return new Object(-1, 'node_route is not defined');
+
+		$args->member_srl = $logged_info->member_srl;
+		$args->user_id = $logged_info->user_id;
+		$args->node_route = $node_route;
+		$args->node_type = "2";
+		$output = executeQuery('purplebook.getPurplebookList', $args);
+		if(!$output->toBool()) return $output;
+
+		require_once('lib/vCard.php');
+
+		header('Content-Type: text/x-vcard');  
+		header('Content-Disposition: inline; filename= "address_list_' . date('Ymd') . '.vcf"');  
+		header('Content-Length: '.filesize($vCard));  
+
+		$vCard = new vCard;
+
+		foreach($output->data as $key=>$row)
+		{
+			$vCard->n(iconv("UTF-8", "EUC-KR", $row->node_name), 'FirstName');
+			$vCard->tel($row->phone_num);
+			echo $vCard;
+		}
+	}
+
+
+	/**
+	 * 주소록 엑셀로 다운로드
+	 */
+	function dispPurplebookAddressDownload() 
+	{
+		$oPurplebookModel = &getModel('purplebook');
+
+        $logged_info = Context::get('logged_info');
+        if(!$logged_info) return new Object(-1, 'msg_not_logged');
+
+        header("Content-Type: application/vnd.ms-excel;");
+        header("Content-Disposition: attachment; filename=\"address_list_" . date('Ymd') . ".xls\"");
+
+		$node_route = Context::get('node_route');
+		if(!$node_route) return new Object(-1, 'node_route is not defined');
+
+		$args->member_srl = $logged_info->member_srl;
+		$args->user_id = $logged_info->user_id;
+		$args->node_route = $node_route;
+		$args->node_type = "2";
+		$output = executeQuery('purplebook.getPurplebookList', $args);
+		if(!$output->toBool()) return $output;
+
+        echo "<?xml version='1.0' encoding='utf-8'?>\n";
+        echo <<<THESTRING
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" 
+xmlns:o="urn:schemas-microsoft-com:office:office" 
+xmlns:x="urn:schemas-microsoft-com:office:excel" 
+xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" 
+xmlns:html="http://www.w3.org/TR/REC-html40">
+<Worksheet ss:Name="주소록리스트"> 
+<Table> 
+<Row> 
+  <Cell><Data ss:Type="String">이름</Data></Cell> 
+  <Cell><Data ss:Type="String">번호</Data></Cell> 
+  <Cell><Data ss:Type="String">메모1</Data></Cell> 
+  <Cell><Data ss:Type="String">메모2</Data></Cell> 
+  <Cell><Data ss:Type="String">메모3</Data></Cell> 
+</Row> 
+THESTRING;
+        foreach($output->data as $key=>$row)
+        {
+            echo sprintf('<Row><Cell><Data ss:Type="String">%s</Data></Cell><Cell><Data ss:Type="String">%s</Data></Cell><Cell><Data ss:Type="String">%s</Data></Cell><Cell><Data ss:Type="String">%s</Data></Cell><Cell><Data ss:Type="String">%s</Data></Cell></Row>', $row->node_name, $row->phone_num, $row->memo1, $row->memo2, $row->memo3);
+        }
+
+        echo <<<THESTRING
+</Table> 
+</Worksheet> 
+</Workbook> 
+THESTRING;
+        exit(0);
+    }
 }
 /* End of file purplebook.view.php */
 /* Location: ./modules/purplebook/purplebook.view.php */
