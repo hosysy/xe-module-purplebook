@@ -185,7 +185,7 @@ class purplebookController extends purplebook
 			if(!$output->toBool()) return $output;
 		}
 
-		// 발송루트 추가 
+		// 발송루트, App_version 추가 
 		$args->route = "Purplebook";
 		$args->app_version = "Purplebook 4.3";
 
@@ -389,6 +389,8 @@ class purplebookController extends purplebook
 					return;
 				break;
 		}
+
+		if($width >= 2048 || $height >= 2048) return new Object(-1, 'image resolution is too big');
 		
 		$file_srl = getNextSequence();
 		$path = $oPurplebookModel->getFilePickerPath($file_srl);
@@ -635,32 +637,12 @@ class purplebookController extends purplebook
 		// 강제적으로 요청을 JSON으로 한다.
 		Context::setRequestMethod("JSON");
 
-		// excel 파일을 읽기위한 php파일 가져오기 
-		require_once('excel_reader2.php');
-
 		$vars = Context::getRequestVars();
 
 		$ext = substr(strrchr($vars->excel_file["name"],"."),1); //확장자앞 .을 제거하기 위하여 substr()함수를 이용
 		$ext = strtolower($ext); //확장자를 소문자로 변환
 
 		if($ext == null) return new Object(-1, 'msg_not_found_file'); // 파일 존재 여부 검사
-		if($ext != 'xls') return new Object(-1, "msg_excel_check_extension");  //확장자 검사
-
-		$data = new Spreadsheet_Excel_Reader();
-		//$data->setOutputEncoding('CP949');
-		$data->read($vars->excel_file["tmp_name"]); // 엑셀파일 읽기
-
-		// numRows가 가로 numCols가 세로
-		for ($i = 1; $i <= $data->sheets[0]['numCols']; $i++) {
-			for ($j = 1; $j < $data->sheets[0]['numRows']; $j++) {
-				// 로드된 excel파일을 순서에 맞춰서 array로 정렬
-				$array_test[$data->sheets[0]['cells'][1][$i]][] = $data->sheets[0]['cells'][$j+1][$i];
-			}
-		}
-
-		// 타이틀이 하나라도 들어있지 않다면 리턴 false
-		if(!array_key_exists('name',$array_test)) return new Object(-1, "msg_excel_name_empty");
-		if(!array_key_exists('number',$array_test)) return new Object(-1, "msg_excel_number_empty");
 
 		$parent_node = Context::get('parent_node');
 
@@ -683,20 +665,61 @@ class purplebookController extends purplebook
 			$node_route = $output->data->node_route . $parent_node . '.';
 		}
 
+		if($ext == 'xls') 
+		{
+			// excel xls 파일을 읽기위한 php파일 가져오기 
+			require_once('lib/excel_reader2.php');
+			$data = new Spreadsheet_Excel_Reader();
+			//$data->setOutputEncoding('CP949');
+			$data->read($vars->excel_file["tmp_name"]); // 엑셀파일 읽기
+
+			// numRows가 가로 numCols가 세로
+			for ($i = 1; $i <= $data->sheets[0]['numCols']; $i++) {
+				for ($j = 2; $j <= $data->sheets[0]['numRows']; $j++) {
+					// 로드된 excel파일을 순서에 맞춰서 array로 정렬
+					$file_info[$data->sheets[0]['cells'][1][$i]][] = $data->sheets[0]['cells'][$j][$i];
+				}
+			}
+		}
+		else if($ext == 'xlsx')
+		{
+			// excel xlsx 파일을 읽기위한 php파일 가져오기
+			require_once('lib/excel_xlsx_reader.php');
+			$excel_xlsx_reader = new excel_xlsx_reader();
+			$excel_xlsx_reader->init($vars->excel_file["tmp_name"]);
+			$excel_xlsx_reader->load_sheet();
+
+			for($i=0; $i < $excel_xlsx_reader->colsize; $i++)
+			{
+				for($j=1; $j < $excel_xlsx_reader->rowsize; $j++)
+				{
+					$file_info[$excel_xlsx_reader->val(0,$i)][] = iconv(mb_detect_encoding($excel_xlsx_reader->val($j,$i)), "utf-8", $excel_xlsx_reader->val($j,$i));
+				}
+			}
+		}
+		else
+		{
+			return new Object(-1, "msg_excel_check_extension");  //확장자 검사
+		}
+
+		// 타이틀이 하나라도 들어있지 않다면 리턴 false
+		if(!array_key_exists('name',$file_info)) return new Object(-1, "msg_excel_name_empty");
+		if(!array_key_exists('number',$file_info)) return new Object(-1, "msg_excel_number_empty");
+
 		$list = array();
-		for($i = 0; $i < count($array_test['name']); $i++)
+		for($i = 0; $i < count($file_info['name']); $i++)
 		{
 			$args = new StdClass();
 			$args->member_srl = $logged_info->member_srl;
 			$args->user_id = $logged_info->user_id;
 			$args->parent_node = $vars->parent_node;
 			$args->node_route = $node_route;
-			$args->node_name = $array_test['name'][$i];
+			$args->node_name = $file_info['name'][$i];
 			$args->node_type = '2';
-			$args->phone_num = str_replace('-', '', $array_test['number'][$i]);
-			$args->memo1 = $array_test['memo1'][$i];
-			$args->memo2 = $array_test['memo2'][$i];
-			$args->memo3 = $array_test['memo3'][$i];
+			$args->phone_num = str_replace('-', '', $file_info['number'][$i]);
+			$args->memo1 = $file_info['memo1'][$i];
+			$args->memo2 = $file_info['memo2'][$i];
+			$args->memo3 = $file_info['memo3'][$i];
 
 			// purplebook table에 업로드
 			$output = $this->insertPurplebook($args);
@@ -705,14 +728,102 @@ class purplebookController extends purplebook
 			$list[] = $args;
 		}
 
-		if(!in_array($parent_node, array('f.','t.','s.')))
-		{
-			$this->updateSubnode($logged_info->member_srl, $parent_node);
-		}
+		if(!in_array($parent_node, array('f.','t.','s.'))) $this->updateSubnode($logged_info->member_srl, $parent_node);
 
-		$this->add('list',$list);
+		$this->add('list', $list);
+		$this->add('text', count($list) . '개의 파일이 추가되었습니다.(excel)');
 	}
 
+	/**
+	 * 전체보기창 vcf로 주소록에 추가
+	 */
+	function procPurplebookVcfLoad()
+	{
+		$oPurplebookModel = getModel('purplebook');
+
+		$logged_info = Context::get('logged_info');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
+
+		// 강제적으로 요청을 JSON으로 한다.
+		Context::setRequestMethod("JSON");
+
+		// vcf 파일을 읽기위한 php파일 가져오기 
+		require_once('lib/vCard.php');
+
+		$vars = Context::getRequestVars();
+		$ext = substr(strrchr($vars->vcf_file["name"],"."),1); //확장자앞 .을 제거하기 위하여 substr()함수를 이용
+		$ext = strtolower($ext); //확장자를 소문자로 변환
+
+		if($ext == null) return new Object(-1, 'msg_not_found_file'); // 파일 존재 여부 검사
+		if($ext != 'vcf') return new Object(-1, "msg_excel_check_extension");  //확장자 검사
+
+		// get node_route
+		if(in_array($vars->parent_node, array('f.','t.','s.')))
+		{
+			$node_route = $vars->parent_node;
+		}
+		else
+		{
+			// get parent node
+			$args->node_id = $vars->parent_node;
+			$output = executeQuery('purplebook.getNodeInfoByNodeId', $args);
+			if(!$output->toBool()) return $output;
+			if(!$output->data) return new Object(-1, 'msg_invalid_request');
+
+			// check for permission
+			if($output->data->member_srl != $logged_info->member_srl) return new Object(-1,'msg_no_permission');
+
+			$node_route = $output->data->node_route . $vars->parent_node . '.';
+		}
+
+		$vCard = new vCard($vars->vcf_file["tmp_name"]); // vcf파일 읽기
+		if(count($vCard) == 0) return new Object(-1, 'vcf file is empty');
+
+		$args = new StdClass();
+		if(count($vCard) == 1)
+		{
+			$data = $oPurplebookModel->getVcCardData($vCard);
+			if(!$data['name'] && !$data['number']) return new Object(-1, 'missing name or phone number');
+			$args->member_srl = $logged_info->member_srl;
+			$args->user_id = $logged_info->user_id;
+			$args->parent_node = $vars->parent_node;
+			$args->node_route = $node_route;
+			$args->node_name = $data['name'];
+			$args->node_type = '2';
+			$args->phone_num = str_replace('-', '', $data['number']);
+
+			// purplebook table에 업로드
+			$output = $this->insertPurplebook($args);
+			if(!$output->toBool()) return $output;
+
+			$list[] = $args;
+		}
+		// if the file contains multiple vCards, they are accessible as elements of an array
+		else
+		{
+			foreach($vCard as $key => $val)
+			{
+				$data = $oPurplebookModel->getVcCardData($val);
+				if(!$data['name'] && !$data['number']) return new Object(-1, 'missing name or phone number');
+				$args->member_srl = $logged_info->member_srl;
+				$args->user_id = $logged_info->user_id;
+				$args->parent_node = $vars->parent_node;
+				$args->node_route = $node_route;
+				$args->node_name = iconv("EUC-KR", "UTF-8", $data['name']);
+				$args->node_type = '2';
+				$args->phone_num = str_replace('-', '', $data['number']);
+
+				// purplebook table에 업로드
+				$output = $this->insertPurplebook($args);
+				if(!$output->toBool()) return $output;
+
+				$list[] = $args;
+				$args = new StdClass();
+			}
+		}
+		$this->add('list', $list);
+		$this->add('text', count($list) . '개의 주소록이 추가되었습니다.(vcf)');
+	}
 
 	/**
 	 * 주소록 Node List 추가
@@ -1087,10 +1198,10 @@ class purplebookController extends purplebook
 		$parameters['signature'] = hash_hmac('md5', $parameters['timestamp'].$parameters['salt'], $api_secret);
 		//$parameters['handle_key'] = Context::get('handle_key');
 		
-		$query_string = sprintf("/senderid/1/%s", $resource);
+		$query_string = sprintf("/senderid/1.1/%s", $resource);
 		if($method == 'GET') $query_string = sprintf("%s?%s", $query_string, http_build_query($parameters));
 		require_once(_XE_PATH_ . 'classes/httprequest/XEHttpRequest.class.php');
-		$http = new XEHttpRequest('rest1.coolsms.co.kr', 80);
+		$http = new XEHttpRequest('api.coolsms.co.kr', 80);
 		$result = $http->send($query_string, $method, 10, $parameters);
 		if(is_a($result, 'Object')) return $result;
 		$output = new Object();
@@ -1389,9 +1500,7 @@ class purplebookController extends purplebook
 		foreach($node_ids as $val)
 		{
 			Context::set('node_id', $val);
-
 			$this->procPurplebookDeleteNode();
-
 			Context::set('node_id', null);
 		}
 	}

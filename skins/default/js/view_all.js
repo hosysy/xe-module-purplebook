@@ -211,6 +211,7 @@ var pb_overlap_menu = '';
 function pb_address_menu(id) {
 	jQuery("#pb_add_address_excel").css('display','none');
 	jQuery("#pb_add_address_direct").css('display','none');
+	jQuery("#pb_add_address_vcf").css('display','none');
 	jQuery("#pb_address_history").css('display','none');
 
 	//jQuery(id).css('display','block');
@@ -568,9 +569,11 @@ jQuery(document).ready(function($){
 		jQuery("#add_address_excel_form").ajaxSubmit({
 			dataType : 'json',
 			success : function(data){
+				jQuery("#excel_loading_box").hide();
+
 				// procPurplebookExcelLoad error 발생시
 				if (data.error == -1) {
-					alert(data.message);
+					pb_set_address_status(data.message); 
 					return;
 				}
 
@@ -579,12 +582,56 @@ jQuery(document).ready(function($){
 
 				// 전체보기 Status와 History에 글올리기
 				pb_set_address_status("엑셀파일로 추가되었습니다. "); 
-				jQuery("#excel_loading_box").hide();
 			},
 			error:function(request,status,error){
 				// ajaxSubmit 실패시 
 				alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error+"\n"+"status:"+status);
 				jQuery("#excel_loading_box").hide();
+			}
+		});
+		return false;
+	});
+
+	/**
+	 * view_all.html에서 vcf파일로 주소록에 명단 추가
+	 */
+	jQuery(document).on('click', '#btnAddFullAddressVcf', function () {
+		var selected_folders = jQuery('#smsPurplebookTree').jstree('get_selected');
+		if (selected_folders.length != 1) {
+			alert('선택된 폴더가 없습니다.');
+			return;
+		}
+
+		var node = jQuery(selected_folders[0]);
+
+		// set data
+		jQuery("#vcf_parent_node").val(node.attr('node_id'));
+		jQuery("#vcf_node_id").val(node.attr('node_route'));
+		jQuery("#vcf_node_name").val(node.attr('node_name'));
+		jQuery("#vcf_node_type").val('2');
+
+		jQuery("#vcf_loading_box").show();
+
+		jQuery("#add_address_vcf_form").ajaxSubmit({
+			dataType : 'json',
+			success : function(data){
+				jQuery("#vcf_loading_box").hide();
+				// error 발생시
+				if (data.error == -1) {
+					pb_set_address_status(data.message); 
+					return;
+				}
+
+				// 화면에 업데이트된 리스트 새로고침
+				pb_load_address(null, false);
+
+				// 전체보기 Status와 History에 글올리기
+				pb_set_address_status("VCF파일로 추가되었습니다."); 
+			},
+			error:function(request,status,error){
+				// ajaxSubmit 실패시
+				alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error+"\n"+"status:"+status);
+				jQuery("#vcf_loading_box").hide();
 			}
 		});
 		return false;

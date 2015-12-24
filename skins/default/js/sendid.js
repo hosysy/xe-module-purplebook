@@ -80,8 +80,8 @@ function refreshCallbackList() {
 
 function completeGetCallbackList(ret_obj, response_tags) {
 	$list = jQuery('#smsPurplebookCallbackList').empty();
-	if (ret_obj['data']['data']) {
-		var data = ret_obj['data']['data']['item'];
+	if (ret_obj['data']) {
+		var data = ret_obj['data']['item'];
 		if (!jQuery.isArray(data)) {
 			data = new Array(data);
 		}
