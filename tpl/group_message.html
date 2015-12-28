@@ -12,6 +12,8 @@
 				<select name="group_srl">
 					<option loop="$group_list => $key, $val" value="{$val->group_srl}">{$val->title}</option>
 				</select>
+				<a href="#about_group_srl" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
+				<p id="about_group_srl" class="x_help-block" hidden>문자메시지를 발송할 대상 그룹을 선택하세요.</p>
 			</div>
 		</div>
 
@@ -24,6 +26,17 @@
 				</select>
 				<a href="#about_cellphone_fieldname_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
 				<p id="about_cellphone_fieldname_help" class="x_help-block" hidden>문자메시지를 발송할 휴대전화필드를 선택하세요.</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label">이름필드 선택</label>
+			<div class="x_controls">
+				<select name="name_fieldname">
+					<option value="">{$lang->select}</option>
+					<option loop="$member_config->signupForm=>$item" value="{$item->name}" selected="selected"|cond="$item->name=='nick_name'">{$item->title}</option>
+				</select>
+				<a href="#about_name_fieldname_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
+				<p id="about_name_fieldname_help" class="x_help-block" hidden>이름필드를 선택하세요.</p>
 			</div>
 		</div>
 	</section>
