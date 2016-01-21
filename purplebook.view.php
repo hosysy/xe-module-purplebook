@@ -45,6 +45,39 @@ class purplebookView extends purplebook
 		}
 
 		$this->setTemplateFile('address');
+
+		// 관리자가 아니면 그냥 리턴한다.
+		if(!$logged_info || $logged_info->is_admin != 'Y') return;
+
+		// administrator이고 group_srl과 cellphone_fieldname이 파라메터로 넘어올 경우 해당 그룹의 회원의 전화번호 목록을 출력할 수 있도록 템플릿에 넘겨준다.
+		$group_srl = Context::get('group_srl');
+		$cellphone_fieldname = Context::get('cellphone_fieldname');
+		$name_fieldname = Context::get('name_fieldname');
+		if(!$name_fieldname) $name_fieldname = 'nick_name';
+		if(!$group_srl || !$cellphone_fieldname) return;
+
+		// 해당 그룹의 회원 목록 가져오기
+		$oMemberModel = &getModel('member');
+		$args->selected_group_srl = $group_srl;
+		$args->page = 1;
+		$args->list_count = 99999;
+		$args->page_count = 10;
+		$output = executeQueryArray('member.getMemberListWithinGroup', $args);
+		if(!$output->toBool()) return $output;
+		$member_list = $output->data;
+		foreach($member_list as $key => $member_info)
+		{
+			// 회원 기본정보에서 참조이름 값을 가져온다.
+			if($member_info->{$name_fieldname}) $member_list[$key]->_purplebook->ref_name = $member_info->{$name_fieldname};
+			// 확장변수에서 전화번호 필드의 값을 가져온다.
+			$extra_vars = unserialize($member_info->extra_vars);
+			$member_list[$key]->_purplebook->cellphone = is_array($extra_vars->{$cellphone_fieldname}) 
+				? implode($extra_vars->{$cellphone_fieldname}) 
+				: str_replace('|@|', '', $extra_vars->{$cellphone_fieldname});
+			// 확장변수에서 참조이름 값을 가져온다.
+			if($extra_vars->{$name_fieldname}) $member_list[$key]->_purplebook->ref_name = $extra_vars->{$name_fieldname};
+		}
+		Context::set('member_list', $member_list);
 	}
 
 	/**

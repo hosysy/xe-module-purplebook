@@ -95,6 +95,21 @@ class purplebookAdminView extends purplebook
 
 		$this->setTemplateFile('grant_list');
 	}
+
+	/**
+	 * group message
+	 */
+	function dispPurplebookAdminGroupMessage() 
+	{
+		$oMemberModel = &getModel('member');
+		$member_config = $oMemberModel->getMemberConfig();
+		Context::set("member_config", $member_config);
+
+		$this->group_list = $oMemberModel->getGroups();
+		Context::set('group_list', $this->group_list);
+
+		$this->setTemplateFile('group_message');
+	}
 }
 /* End of file purplebook.admin.view.php */
 /* Location: ./modules/purplebook/purplebook.admin.view.php */
