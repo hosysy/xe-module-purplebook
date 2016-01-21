@@ -298,7 +298,7 @@ class purplebookModel extends purplebook
 		if(Context::get("page")) $args->page = Context::get("page");
 		else $args->page = 1;
 
-		$args->list_count = 20;
+		$args->list_count = 9999;
 		// 리스트 카운트
 		if(Context::get("list_count"))
 		{
