@@ -194,7 +194,7 @@
 
     $.fn.newsTicker.config = {
         // set values and custom functions
-		interval: "4000",
+		interval: "6000",
 		newsData: "#newsData",
 		prevBtnDiv: "#prevDiv",
 		nextBtnDiv: "#nextDiv",
