@@ -804,12 +804,13 @@ class purplebookController extends purplebook
 			foreach($vCard as $key => $val)
 			{
 				$data = $oPurplebookModel->getVcCardData($val);
-				if(!$data['name'] && !$data['number']) return new Object(-1, 'missing name or phone number');
+				if(!$data['number']) continue;
+
 				$args->member_srl = $logged_info->member_srl;
 				$args->user_id = $logged_info->user_id;
 				$args->parent_node = $vars->parent_node;
 				$args->node_route = $node_route;
-				$args->node_name = iconv("EUC-KR", "UTF-8", $data['name']);
+				$args->node_name = iconv(mb_detect_encoding($data['name']), "UTF-8", $data['name']);
 				$args->node_type = '2';
 				$args->phone_num = str_replace('-', '', $data['number']);
 
