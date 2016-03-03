@@ -432,6 +432,7 @@ function add_folder(node_route, node_id, f_name) {
 	var response_tags = new Array('error','message','data');
 
 	params['node_route'] = node_route + node_id + ".";
+	params['node_id'] = node_id;
 	
 	/**
 	 * 최상위 폴더가 들어오면 node_id에 node_route가 들어오기 때문에 처리를 해줘야한다.

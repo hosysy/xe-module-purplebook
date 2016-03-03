@@ -369,6 +369,7 @@ function getFolderMessageList() {
 				, "callback": jQuery('#smsPurplebookCallback').val()
 				, "splitlimit": "0"
 				, "node_route": target_list.attr('node_route')
+				, "node_id": target_list.attr('node_id')
 				, "count": target_list.attr('count')
 				, "reservdate": texting_pickup_reservdate()
 			}
@@ -378,6 +379,7 @@ function getFolderMessageList() {
 				, "callback": jQuery('#smsPurplebookCallback').val()
 				, "splitlimit": "0"
 				, "node_route": target_list.attr('node_route')
+				, "node_id": target_list.attr('node_id')
 				, "count": target_list.attr('count')
 			}
 		}

@@ -1023,10 +1023,14 @@ class purplebookModel extends purplebook
 	 */
 	function getPurplebookListCount()
 	{
+		$oPurplebookController = &getController('purplebook');
 		$logged_info = Context::get('logged_info');
 		if(!Context::get('is_logged') || !$logged_info) return new Object(-1, 'msg_login_required');
 
-		$args->member_srl = $logged_info->member_srl;
+		// 공유 폴더라면 체크 후 member_srl 없이 찾도록 해준다
+		$share_check = $oPurplebookController->checkShareList($logged_info->member_srl, Context::get('node_id'));
+		if($share_check == true) unset($args->member_srl);
+
 		$args->node_route = Context::get('node_route');
 		$args->node_type = "2";
 

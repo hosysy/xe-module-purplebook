@@ -302,6 +302,7 @@ class purplebookView extends purplebook
 		$args->user_id = $logged_info->user_id;
 		$args->node_route = $node_route;
 		$args->node_type = "2";
+		$args->list_count = 99999;
 		$output = executeQuery('purplebook.getPurplebookList', $args);
 		if(!$output->toBool()) return $output;
 

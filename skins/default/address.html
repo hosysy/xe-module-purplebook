@@ -136,7 +136,7 @@
 					<li loop="$member_list => $key, $member_info" cond="$member_info->_purplebook->cellphone" id="tel{$member_info->_purplebook->cellphone}">
 						<span class="checkbox"></span>
 						<span class="name">{$member_info->_purplebook->ref_name}</span>
-						<span class="number">{$member_info->_purplebook->cellphone}</span>
+						<span class="number" phonenum="{$member_info->_purplebook->cellphone}">{$member_info->_purplebook->cellphone}</span>
 						<span class="delete" alt="삭제">삭제</span>
 					</li>
 				</ul>

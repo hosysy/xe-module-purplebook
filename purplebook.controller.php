@@ -85,6 +85,10 @@ class purplebookController extends purplebook
 				$vars->page = $v->page;
 				$vars->list_count = $v->list_count;
 
+				// 공유된 폴더라면 member_srl 을 제거 해준다.
+				$share_check = $this->checkShareList($logged_info->member_srl, $v->node_id);
+				if($share_check == true) unset($vars->member_srl);
+
 				$output = executeQueryArray("purplebook.getPurplebookListByNodeRoute", $vars);
 				if(!$output->toBool()) return $output;
 				if(!$output->data) return;
@@ -643,6 +647,8 @@ class purplebookController extends purplebook
 		$ext = strtolower($ext); //확장자를 소문자로 변환
 
 		if($ext == null) return new Object(-1, 'msg_not_found_file'); // 파일 존재 여부 검사
+
+		if($ext != 'xls') return new Object(-1, '지원되는 확장자가 아닙니다. (.xls)를 이용해주세요.');
 
 		$parent_node = Context::get('parent_node');
 
@@ -1520,6 +1526,19 @@ class purplebookController extends purplebook
 		{
 			$output = $oTextMessageController->cancelMessage($val, $basecamp);
 		}
+	}
+
+	/**
+	 * 해당 폴더가 공유된 폴더인지 확인 후 맞으면 true 아니면 false
+	 */
+	function checkShareList($member_srl, $node_id)
+	{
+		$args->member_srl = $member_srl;
+		$args->node_id = $node_id;
+		$output = executeQuery('purplebook.getPurplebookShareList', $args);
+		if (!$output->toBool()) return $output;
+		if (!$output->data) return false;
+		return true;
 	}
 }
 /* End of file purplebook.controller.php */
