@@ -444,7 +444,9 @@
 		 * 발신번호관리
 		 */
 		layer_popup_set('#layer_sendid', '<div id="layer_sendid" class="layer draggable"></div>', '.btn_show_layer', '#smsMessage .right_button');
-		layer_popup_set('#layer_senderid_verification', '<div id="layer_senderid_verification" class="layer draggable"></div>', '#pb_result_button', '#smsMessage .right_button');
+		if ($("#pb_result_button").length > 0) {
+			layer_popup_set('#layer_senderid_verification', '<div id="layer_senderid_verification" class="layer draggable"></div>', '#pb_result_button', '#smsMessage .right_button');
+		}
 
 		/**
 		 * 예약발송
