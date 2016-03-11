@@ -715,6 +715,7 @@ class purplebookController extends purplebook
 		$list = array();
 		for($i = 0; $i < count($file_info['name']); $i++)
 		{
+			if(!$file_info['name'][$i]) continue;
 			$args = new StdClass();
 			$args->member_srl = $logged_info->member_srl;
 			$args->user_id = $logged_info->user_id;

@@ -1029,7 +1029,7 @@ class purplebookModel extends purplebook
 
 		// 공유 폴더라면 체크 후 member_srl 없이 찾도록 해준다
 		$share_check = $oPurplebookController->checkShareList($logged_info->member_srl, Context::get('node_id'));
-		if($share_check == true) unset($args->member_srl);
+		$args->member_srl = $share_check ? null : $logged_info->member_srl;
 
 		$args->node_route = Context::get('node_route');
 		$args->node_type = "2";
