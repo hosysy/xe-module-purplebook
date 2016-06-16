@@ -8,6 +8,9 @@
     </item>
     <item name="mms">
         <value xml:lang="ko"><![CDATA[MMS포토]]></value>
+	</item>
+	<item name="ata">
+        <value xml:lang="ko"><![CDATA[알림톡]]></value>
     </item>
     <item name="reserv_send">
         <value xml:lang="ko"><![CDATA[예약전송]]></value>
@@ -69,6 +72,12 @@
     </item>
     <item name="arranged_mms_number">
         <value xml:lang="ko"><![CDATA[예정 MMS 건수: ]]></value>
+	</item>
+	<item name="available_ata_number">
+        <value xml:lang="ko"><![CDATA[가능 알림톡 건수: ]]></value>
+    </item>
+    <item name="arranged_ata_number">
+        <value xml:lang="ko"><![CDATA[예정 알림톡 건수: ]]></value>
     </item>
     <item name="cellphone">
         <value xml:lang="ko"><![CDATA[핸드폰]]></value>

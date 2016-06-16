@@ -135,13 +135,16 @@
 		 * 저장된 입력내용 레이어
 		 */
 		$(document).on('click', '#smsPurplebookContentInput .pop_messages', function() {
+			layer_name = 'layer_messages';
+			if (USE_ALIMTALK == true) {
+				layer_name = 'layer_alimtalk';
+			}
 			var params = new Array();
 			var response_tags = new Array('error','message','data');
 
 			params['g_mid'] = g_mid;
-			params['layer_name'] = 'layer_messages';
-
-			layer_id = '#layer_messages';
+			params['layer_name'] = layer_name;
+			layer_id = '#' + layer_name;
 
 			focus_obj = $(this).parent().next().children('textarea');
 
@@ -149,9 +152,7 @@
 				if (ret_obj["data"]) {
 					jQuery(layer_id).html(ret_obj["data"]);
 					if (jQuery(layer_id).css('display') == 'block') jQuery(layer_id).html('');
-
 					$obj = jQuery(layer_id);
-
 					set_active_textarea(focus_obj);
 					show_and_hide($obj, null, {show_func:pb_load_saved_messages});
 				}
@@ -355,6 +356,14 @@
 		});
 
 		/**
+		 * 옐로아이디관리창 레이어
+		 */
+		$('.btn_show_yellow_id','#smsMessage .right_button').click(function() {
+			popup_layer('layer_yellow_id', '#layer_yellow_id');
+			return false;
+		});
+
+		/**
 		 * 사진추가 레이어
 		 */
 		$(document).on("click", '#btn_attach_pic', function() {
@@ -426,6 +435,11 @@
 		layer_popup_set('#layer_messages', '<div id="layer_messages" class="layer draggable"></div>', '.pop_messages', '#smsPurplebookContentInput');
 
 		/**
+		 * 알림톡 불러오기 
+		 */
+		layer_popup_set('#layer_alimtalk', '<div id="layer_alimtalk" class="layer draggable"></div>', '.pop_messages', '#smsPurplebookContentInput');
+
+		/**
 		 * 머지기능
 		 */
 		layer_popup_set('#layer_merge', '<div id="layer_merge" class="layer draggable"></div>', '#btn_pop_merge');
@@ -445,6 +459,11 @@
 		 */
 		layer_popup_set('#layer_sendid', '<div id="layer_sendid" class="layer draggable"></div>', '.btn_show_layer', '#smsMessage .right_button');
 		layer_popup_set('#layer_senderid_verification', '<div id="layer_senderid_verification" class="layer draggable"></div>', '.btn_show_layer', '#smsMessage .right_button');
+
+		/**
+		 * 알림톡 옐로아이디 관리
+		 */
+		layer_popup_set('#layer_yellow_id', '<div id="layer_yellow_id" class="layer draggable"></div>', '.btn_show_layer', '#smsMessage .right_button');
 
 		/**
 		 * 예약발송
@@ -612,7 +631,28 @@ function completeLoadRecentNumbers(ret_obj,response_tags) {
 function pb_load_saved_messages() {
 	var params = new Array();
 	var response_tags = new Array('error','message','data');
+
+	// 알림톡 사용 시
+	if (USE_ALIMTALK == true) {
+		exec_xml('purplebook','getPurplebookAlimtalkTemplate', params, completeLoadAlimtalkMessages, response_tags);
+		return;
+	}
 	exec_xml('purplebook','getPurplebookSavedMessages', params, completeLoadSavedMessages, response_tags);
+}
+
+function completeLoadAlimtalkMessages(ret_obj,response_tags) {
+	$list = jQuery('#alimtalk_message_list').empty();
+	if (ret_obj['data']) {
+		var data = ret_obj['data']['item'];
+		if (!jQuery.isArray(data)) {
+			data = new Array(data);
+		}
+		for (var i = 0; i < data.length; i++) {
+			$list.append('<li title="' + data[i].template_content + '" template_code="' + data[i].template_code + '"><span class="content">' + data[i].template_content.substring(0,16) + '</span></li>');
+		}
+	} else {
+		$list.append('<li>저장된 내용이 없습니다</li>');
+	}
 }
 
 function completeLoadSavedMessages(ret_obj,response_tags) {

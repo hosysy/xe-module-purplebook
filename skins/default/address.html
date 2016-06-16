@@ -95,7 +95,7 @@
 
 			<!-- 레이어 팝업 영역 -->
 			<div class="left_select">
-				<div class="title_info"><span class="list_count" id="smsPurplebookListCount">0</span><a href="#" class="all_view" id="pb_view_all_button" onclick="alert('앞으로 폴더메뉴의 연락처 관리를 클릭해 주세요.');">전체보기</a></div>
+				<div class="title_info"><span class="list_count" id="smsPurplebookListCount">0</span><a href="#" class="all_view" id="pb_view_all_button">전체보기</a></div>
 				<div class="bodyArea"><ul id="smsPurplebookList"></ul></div>
 				<ul class="bottomArea">
 					<li>
@@ -161,10 +161,10 @@
 
 	<div id="smsMessage">
 		<div class="msgtype_switch">
-			90바이트가 초과되었습니다. 발송방법을 선택해 주세요.
+			90바이트가 초과되었습니다.<br />MMS 장문으로 전환됩니다.( 알림톡, 푸시 제외 )
 			<div>
 				<input type="radio" name="msgtype" id="mmsSend" value="SMS" checked="checked" /><label for="mmsSend">MMS 장문</label>
-				<input type="radio" name="msgtype" id="smsSplit" value="SMS" /><label for="smsSplit">SMS 분할</label>
+				<!-- <input type="radio" name="msgtype" id="smsSplit" value="SMS" /><label for="smsSplit">SMS 분할</label> -->
 			</div>
 		</div>
 
@@ -187,9 +187,9 @@
 				</div>
 				<div class="text_btn">
 					<a class="btn_clear" href="#" title="내용지우기"><span>Clear</span></a>
-					<a class="btn_bytes" href="#" title="90바이트 제한"><span>0bytes</span></a>
+					<a class="btn_bytes" href="#" title="90바이트 제한" onclick="return false;"><span>0bytes</span></a>
 					<a class="close" href="#" style="visibility:hidden;"><span>close</span></a>
-					<button class="btn_addwindow" href="#" title="입력창 추가">창추가</button>
+					<!-- 삭제 예정 <button class="btn_addwindow" href="#" title="입력창 추가">창추가</button>-->
 				</div>
 			</li>
 		</ul><!-- 가운데 액정 끝 -->
@@ -205,8 +205,13 @@
 				<p><input type="text" maxlength="4" value="2400" class="input_text" id="message_send_limit" readonly />개 번호를 <input type="text" maxlength="3" value="1" class="input_text minput" id="message_send_interval" readonly />분 마다 전송</p>
 			</div>
 			<div class="add_area">
-				<input type="text" id="smsPurplebookCallback" maxlength="20" value="{$callback}" readonly="readonly" title="발신번호 입력" onclick="alert('4/16 발신번호 등록제 시행에 따라 등록된 전화번호로만 발송이 가능합니다.\n발신번호선택 버튼을 눌러 등록해 주세요.'); jQuery('.btn_show_layer', '#smsMessage .right_button').trigger('click');" />
+				<input type="text" id="smsPurplebookCallback" class="right_input_text" maxlength="20" value="{$callback}" readonly="readonly" title="발신번호 입력" />
 				<button class="btn_show_layer" title="발신번호선택">발신번호선택</button>
+			</div>
+			<div class="add_area" id="yellowIDBox">
+				<input type="hidden" id="smsPurplebookSenderKey" value="{$sender_key}" />
+				<input type="text" id="smsPurplebookYellowID" class="right_input_text" maxlength="20" value="{$yellow_id}" readonly="readonly" title="옐로아이디 입력" />
+				<button class="btn_show_yellow_id" title="옐로아이디선택">옐로아이디선택</button>
 			</div>
 			<div class="submit_btn">
 				<a id="pb_preview_button" href="" class="btn_booking">미리보기</a>
@@ -219,6 +224,12 @@
 			</div>
 		</div><!-- 오른쪽 버튼 끝 -->
 		<div class="pb_block_senders_number">무료수신거부전화 <b>080-930-2266</b></div>
+		<div class="pb_right_box">
+			<a href="http://www.coolsms.co.kr/Man_Sending_On_Web#6알림톡보내기">
+				<img src="img/alimtalk_2.png" alt="알림톡"/>
+				<span>알림톡사용방법보러가기</span>
+			</a>
+		</div>
 	</div><!-- smsMessage -->
 </div><!-- pb_container -->
 
@@ -229,6 +240,7 @@
 	var g_sms_point = 0;
 	var g_lms_point = 0;
 	var g_mms_point = 0;
+	var g_ata_point = 20;
 	<block cond="$module_info->sms_point">g_sms_point = {$module_info->sms_point};</block>
 	<block cond="$module_info->lms_point">g_lms_point = {$module_info->lms_point};</block>
 	<block cond="$module_info->mms_point">g_mms_point = {$module_info->mms_point};</block>
@@ -240,6 +252,9 @@
     var g_update_speed = 50;
 	var g_tpl_path = '{$tpl_path}';
 	var g_module_srl = '{$module_info->module_srl}';
+	var callback = '{$callback}';
+	var template_code = '';
+	var sender_key = '';
 
     <!--@foreach($widget_lang as $var => $val)-->
         <!--@if(is_string($val))-->

@@ -53,6 +53,8 @@ class purplebookController extends purplebook
 
 		$encode_utf16 = Context::get('encode_utf16');
 		$decoded = $this->getJSON('data');
+		$sender_key = Context::get('sender_key');
+		$template_code = Context::get('template_code');
 
 		$error_count=0;
 		if(!is_array($decoded)) $decoded = array($decoded);
@@ -78,40 +80,38 @@ class purplebookController extends purplebook
 		// 받는사람목록에 폴더가 들어있을 경우 풀어서 decoded에 집어넣는다
 		foreach($decoded as $k => $v)
 		{
-			if($v->node_route)
+			if(!$v->node_route) continue;
+			$vars->node_route = $node_route;
+			$vars->member_srl = $logged_info->member_srl;
+			$vars->page = $v->page;
+			$vars->list_count = $v->list_count;
+
+			// 공유된 폴더라면 member_srl 을 제거 해준다.
+			$share_check = $this->checkShareList($logged_info->member_srl, $v->node_id);
+			if($share_check == true) unset($vars->member_srl);
+
+			$output = executeQueryArray("purplebook.getPurplebookListByNodeRoute", $vars);
+			if(!$output->toBool()) return $output;
+			if(!$output->data) return;
+
+			foreach($output->data as $k2 => $v2)
 			{
-				$vars->node_route = $node_route;
-				$vars->member_srl = $logged_info->member_srl;
-				$vars->page = $v->page;
-				$vars->list_count = $v->list_count;
-
-				// 공유된 폴더라면 member_srl 을 제거 해준다.
-				$share_check = $this->checkShareList($logged_info->member_srl, $v->node_id);
-				if($share_check == true) unset($vars->member_srl);
-
-				$output = executeQueryArray("purplebook.getPurplebookListByNodeRoute", $vars);
-				if(!$output->toBool()) return $output;
-				if(!$output->data) return;
-
-				foreach($output->data as $k2 => $v2)
-				{
-					$decoded[$v2->node_id]->msgtype = $decoded[$k]->msgtype;
-					$decoded[$v2->node_id]->recipient = $v2->phone_num;
-					$decoded[$v2->node_id]->callback = $decoded[$k]->callback;
-					$decoded[$v2->node_id]->text = $decoded[$k]->text;
-					$decoded[$v2->node_id]->splitlimit = $decoded[$k]->splitlimit;
-					$decoded[$v2->node_id]->refname = $v2->node_name;
-					$decoded[$v2->node_id]->refid = $decoded[$k]->refid;
-					$decoded[$v2->node_id]->delay_count = $decoded[$k]->delay_count;
-					$decoded[$v2->node_id]->node_id = $v2->node_id;
-					$decoded[$v2->node_id]->file_srl = $decoded[$k]->file_srl;
-					$decoded[$v2->node_id]->reservdate = $v->reservdate;
-				}
-				unset($decoded[$k]);
-				unset($vars);
+				$decoded[$v2->node_id]->msgtype = $decoded[$k]->msgtype;
+				$decoded[$v2->node_id]->recipient = $v2->phone_num;
+				$decoded[$v2->node_id]->callback = $decoded[$k]->callback;
+				$decoded[$v2->node_id]->text = $decoded[$k]->text;
+				$decoded[$v2->node_id]->splitlimit = $decoded[$k]->splitlimit;
+				$decoded[$v2->node_id]->refname = $v2->node_name;
+				$decoded[$v2->node_id]->refid = $decoded[$k]->refid;
+				$decoded[$v2->node_id]->delay_count = $decoded[$k]->delay_count;
+				$decoded[$v2->node_id]->node_id = $v2->node_id;
+				$decoded[$v2->node_id]->file_srl = $decoded[$k]->file_srl;
+				$decoded[$v2->node_id]->reservdate = $v->reservdate;
 			}
+			unset($decoded[$k]);
+			unset($vars);
 		}
-		
+
 		// 문자 세팅
 		foreach($decoded as $key => $row)
 		{
@@ -136,6 +136,19 @@ class purplebookController extends purplebook
 						$row->recipient = '0' . substr($row->recipient, $startPos + $i);
 						break;
 					}
+				}
+			}
+
+			// 알림톡일 경우 sender_key, template_code 세팅 및  #{변수}를 {memo1}, {memo2}로 변경
+			if($row->msgtype == "ata") {
+				if(!$template_code || !$sender_key) return new Object(-1, 'template_code 와 sender_key 는 필수 입니다.');
+				$args->sender_key = $sender_key;
+				$args->template_code = $template_code;
+				$match_count = preg_match_all("/#{.*}/Ui", $row->text);
+				if($match_count > 3) return new Object(-1, '퍼플북에서 제공되는 알림톡 변수 갯수는 3개까지 입니다.');
+				for($i=1; $i<=$match_count; $i++)
+				{
+					$row->text = preg_replace("/#{.*}/Ui","{memo" . $i . "}", $row->text, 1);
 				}
 			}
 
@@ -1527,6 +1540,25 @@ class purplebookController extends purplebook
 		{
 			$output = $oTextMessageController->cancelMessage($val, $basecamp);
 		}
+	}
+
+	/**
+	 * defalt yellow id set
+	 */
+	function procPurplebookSetDefaultYellowID()
+	{
+		$oAlimtalkController = &getController('alimtalk');
+
+		$args->alim_user_srl = Context::get('alim_user_srl');
+		if (!$args->alim_user_srl) return new Object(-1, 'alim_user_srl is required');
+
+		$logged_info = Context::get('logged_info');
+		if (!$logged_info) return new Object(-1, 'msg_login_required');
+
+		$args->flag_default = 'Y';
+		if (Context::get('flag_default')) $args->flag_default = Context::get('flag_default');
+		$output = $oAlimtalkController->procAlimtalkSetDefault($args);
+		if(!$output->toBool()) return $output;
 	}
 
 	/**

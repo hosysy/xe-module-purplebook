@@ -35,6 +35,8 @@
 		<action name="getPurplebookCallbackNumbers" type="model" />
 		<action name="getPurplebookLatestNumbers" type="model" />
 		<action name="getPurplebookSavedMessages" type="model" />
+		<action name="getPurplebookAlimtalkInfo" type="model" />
+		<action name="getPurplebookAlimtalkTemplate" type="model" />
 		<action name="getPurplebookUpdateAddress" type="model" />
 		<action name="getPurplebookResult" type="model" />
 		<action name="getPurplebookPreview" type="model" />
@@ -75,5 +77,6 @@
 		<action name="procPurplebookSetDefaultSenderID" type="controller" stradalone="true" />
 		<action name="procPurplebookDeleteSenderID" type="controller" stradalone="true" />
 		<action name="procPurplebookVcfLoad" type="controller" stradalone="true" />
+		<action name="procPurplebookSetDefaultYellowID" type="controller" stradalone="true" />
 	</actions>
 </module>

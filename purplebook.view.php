@@ -28,7 +28,7 @@ class purplebookView extends purplebook
 
 		$logged_info = Context::get('logged_info');
 
-		$lang_list = array('sms','lms','mms','reserv_send','direct_send','msg_not_enough_money','available_sms_number','arranged_sms_number','msg_will_you_try','reservation_datetime','number_to_send','msg_will_you_send','msg_not_enough_money','available_lms_number','arranged_lms_number','available_mms_number','arranged_mms_number','msg_login_required');
+		$lang_list = array('sms','lms','mms','ata','reserv_send','direct_send','msg_not_enough_money','available_sms_number','arranged_sms_number','msg_will_you_try','reservation_datetime','number_to_send','msg_will_you_send','msg_not_enough_money','available_lms_number','arranged_lms_number','available_mms_number','arranged_mms_number','msg_login_required','available_ata_number','arranged_ata_number');
 
 		$widget_lang = new StdClass();
 		foreach ($lang_list as $val)
@@ -42,6 +42,19 @@ class purplebookView extends purplebook
 			$oPurplebookModel = &getModel('purplebook');
 			$callback = $oPurplebookModel->getDefaultSenderID($logged_info->user_id, $basecamp);
 			if(is_string($callback)) Context::set('callback', $callback);
+
+			// 알림톡 설정
+			$oAlimtalkModel = &getModel('alimtalk');
+			$output = $oAlimtalkModel->getAlimtalkUsers($logged_info->member_srl);
+			if($output->data) 
+			{	
+				foreach($output->data as $val)
+				{
+					if($val->flag_default != 'Y') continue;
+					Context::set('sender_key', $val->sender_key);
+					Context::set('yellow_id', $val->yellow_id);
+				}
+			}
 		}
 
 		$this->setTemplateFile('address');

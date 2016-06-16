@@ -5,6 +5,7 @@
 
 var MAX_SCREEN = 3;
 var timeoutHandle = null;
+var USE_ALIMTALK = false;
 
 (function($) {
 	jQuery(function($) {
@@ -92,15 +93,19 @@ var timeoutHandle = null;
 		 * screen 내용 저장
 		 */
 		$(document).on('click', '#smsPurplebookContentInput .btn_record', function() {
+			if (USE_ALIMTALK == true) {
+				alert("알림톡에서는 지원하지 않는 기능입니다.");
+				return false;
+			}
 			var content = $('textarea',$(this).parent().parent()).val();
 			pb_keep_message_content(content);
 			return false;
 		});
 
 		/**
-			screen에 text추가
-			@constructor 
-		*/ 
+		 * screen에 text추가
+		 * @constructor 
+		 */ 
 		$(document).on('click', '#merge1', function() {
 			insert_merge('{name}');
 		});
@@ -123,9 +128,9 @@ var timeoutHandle = null;
 			display_bytes();
 		}
 		/**
-			screen에 text추가 END
-			@constructor
-		*/
+		 * screen에 text추가 END
+		 * @constructor
+		 */
 
 		/**
 		 * 사진삭제
@@ -137,19 +142,76 @@ var timeoutHandle = null;
 			update_screen();
 			return false;
 		});
-
+		
 		/**
-		 * screen 안에 byte수 클릭시 return false?
+		 * 알림톡 버튼 클릭시
 		 */
-		$(document).on('click', '#smsMessage .btn_bytes', function() {
+		$(document).on("click", '#btn_alimtalk', function() {
+			if (USE_ALIMTALK == false) {
+				/** css change */
+				$(".btn_record").css({
+					"border-color" : "#ffeb00"
+				});
+				$(".btn_record, .btn_clear, .pop_messages").css({
+					"background" : "#ffe001",
+					"color" : "#312425"
+				});
+
+				$("#smsPurplebookContentInput li").css("border", "1px solid #ffe001");
+				$(".pb_right_box").show();
+				$("#yellowIDBox").show();
+				/** css change end */
+				
+				$("#main_screen").attr("readonly", "readonly");
+				$("#main_screen").val("알림톡은 '불러오기'를 통해서만 메시지 입력이 가능합니다.^^");
+				USE_ALIMTALK = true;
+			} else {
+				/** css change */
+				$(".btn_record").css({
+					"border-color" : "-moz-use-text-color #8dc9e5 -moz-use-text-color -moz-use-text-color"
+				});
+				$(".btn_record, .btn_clear, .pop_messages").css({
+					"background" : "#5c9dc3",
+					"color" : "#fff"
+				});
+				
+				$("#smsPurplebookContentInput li").css("border", "1px solid #5c9dc3");
+				$(".pb_right_box").hide();
+				$("#yellowIDBox").hide();
+				/** css change end*/
+
+				$("#main_screen").removeAttr("readonly");
+				$("#main_screen").val("");
+				USE_ALIMTALK = false;
+			}
 			return false;
 		});
 
 		/**
-			특수문자, 사진추가, 머지기능 버튼 위치설정
+		 * 발신번호 선택 시
+		 */
+		$(document).on('click', '#smsPurplebookCallback', function() {
+			message = '4/16 발신번호 등록제 시행에 따라 등록된 전화번호로만 발송이 가능합니다.\n발신번호선택 버튼을 눌러 등록해 주세요.';
+			alert(message); 
+			$('.btn_show_layer', '#smsMessage .right_button').trigger('click');
+			return false;
+		});
+
+		/**
+		 * 옐로아이디 선택 시
+		 */
+		$(document).on('click', '#smsPurplebookYellowID', function() {
+			message = '알림톡은 옐로아이디를 이용해 사용 가능합니다.';
+			alert(message); 
+			$('.btn_show_yellow_id', '#smsMessage .right_button').trigger('click');
+			return false;
+		});
+
+		/**
+			알림톡, 특수문자, 사진추가, 머지기능 버튼 위치설정
 			@constructor
 		*/
-		$("body").append('<div id="pb_left_btn_box"><div id="btn_pop_chars_box"><button id="btn_pop_chars" class="left_btn">특수문자</button></div><div id="btn_attach_pic_box"><button id="btn_attach_pic" class="left_btn">사진추가</button></div><div id="btn_delete_pic_box"><button id="btn_detach_pic" class="left_btn">사진삭제</button></div><div id="btn_pop_merge_box"><button id="btn_pop_merge" class="left_btn">머지기능</button></div></div>');
+		$("body").append('<div id="pb_left_btn_box"><div id="btn_alimtalk_box"><button id="btn_alimtalk" class="left_btn">알림톡</button></div><div id="btn_pop_chars_box"><button id="btn_pop_chars" class="left_btn">특수문자</button></div><div id="btn_attach_pic_box"><button id="btn_attach_pic" class="left_btn">사진추가</button></div><div id="btn_delete_pic_box"><button id="btn_detach_pic" class="left_btn">사진삭제</button></div><div id="btn_pop_merge_box"><button id="btn_pop_merge" class="left_btn">머지기능</button></div></div>');
 
 		var left_button_location = $("#pb_btn_location").offset();
 
@@ -157,14 +219,14 @@ var timeoutHandle = null;
 
 		$("#pb_left_btn_box").css({
 			"position":"absolute",
-			"top":left_button_location.top + 2,
+			"top":left_button_location.top - 48,
 			"left":left_button_location.left - location_left - 67,
 			"width":"100px",
 			"height":"100px",
 			"z-index":"50"
 		});
 		/**
-			특수문자, 사진추가, 머지기능 버튼 위치설정 END
+			알림톡, 특수문자, 사진추가, 머지기능 버튼 위치설정 END
 			@constructor
 		*/
 	});
@@ -316,15 +378,16 @@ function display_bytes() {
 
 jQuery(document).ready(function (){
 	/**
-		특수문자, 사진추가, 머지기능 버튼 효과
+		알림톡, 특수문자, 사진추가, 머지기능 버튼 효과
 		@constructor
 	*/
+	left_button_location("#btn_alimtalk_box");
 	left_button_location("#btn_pop_chars_box");
 	left_button_location("#btn_attach_pic_box");
 	left_button_location("#btn_delete_pic_box");
 	left_button_location("#btn_pop_merge_box");
 	/**
-		특수문자, 사진추가, 머지기능 버튼 효과 END
+		알림톡, 특수문자, 사진추가, 머지기능 버튼 효과 END
 		@constructor
 	*/
 
@@ -412,6 +475,10 @@ function display_cost() {
 			each_price = 200;
 			msg_type = 'MMS포토';
 			break;
+		case "ata":
+			each_price = 15;
+			msg_type = '알림톡';
+			break;
 	}
 
 	var cost = msg_count * each_price;
@@ -459,6 +526,8 @@ function getMsgType() {
 	var file_srl = jQuery('input[name=file_srl]', '#smsMessage').val();
 	if (file_srl) msgtype = 'mms';
 
+	// 알림톡 이라면 msgtype = 'ata'
+	if (USE_ALIMTALK == true) msgtype = 'ata';
 	return msgtype;
 }
 

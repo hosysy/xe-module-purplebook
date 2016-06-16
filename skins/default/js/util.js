@@ -100,8 +100,10 @@ function checkPhoneFormat(str) {
  * 전화번호 길이 및 숫자인지 검사
  */
 function checkCallbackNumber(str) {
+	// 알림톡 사용시 체크하지 않음 
+	if (USE_ALIMTALK == true) return true;
 	var num_check=/^[0-9]*$/;
-	if(!num_check.test(str) || str.length < 7) {
+	if (!num_check.test(str) || str.length < 7) {
 		return false;
 	}
 

@@ -109,6 +109,7 @@ function pb_load_preview_list(node_id) {
 					, node_ids : JSON.stringify(node_ids)
 					, node_route : node_route
 					, search_keyword : search_keyword
+					, use_alimtalk : USE_ALIMTALK
                  }
         , dataType : "json"
 		, success : function (data) {

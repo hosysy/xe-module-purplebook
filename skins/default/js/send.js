@@ -70,6 +70,10 @@ function send_json(content) {
 
 	content_list = content;
 
+	if (USE_ALIMTALK == true) {
+		sender_key = jQuery('#smsPurplebookSenderKey').val();
+	}
+
 	var data = JSON.stringify(content);
 	/**
 	 * for ie8
@@ -89,6 +93,8 @@ function send_json(content) {
 					, sms_point : g_sms_point
 					, lms_point : g_lms_point
 					, mms_point : g_mms_point
+					, template_code : template_code
+					, sender_key : sender_key
 				 }
 		, dataType : "json"
 		, success : function (data) {
@@ -521,6 +527,7 @@ function completeGetPointInfo(ret_obj, response_tags) {
 	sms_point = parseInt(g_sms_point);
 	lms_point = parseInt(g_lms_point);
 	mms_point = parseInt(g_mms_point);
+	ata_point = parseInt(g_ata_point);
 	if (!sms_point || !lms_point || !mms_point) {
 		alert('포인트 차감 사용으로 되어 있으나 차감할 포인트가 설정되어있지 않습니다.');
 		return false;
@@ -529,6 +536,7 @@ function completeGetPointInfo(ret_obj, response_tags) {
 	sms_avail = calc_sms(obj, sms_point);
 	lms_avail = calc_lms(obj, lms_point);
 	mms_avail = calc_mms(obj, mms_point);
+	ata_avail = calc_ata(obj, ata_point);
 
 	var count = list_counting();
 	switch (getMsgType()) {
@@ -566,6 +574,15 @@ function completeGetPointInfo(ret_obj, response_tags) {
 				return false;
 			}
 			break;
+		case "ata" :
+			if (count > ata_avail) {
+				alert(ret_obj['msg_not_enough_point'] + "\n"
+					+ "현재 포인트: " + point + "\n"
+					+ word_send + "가능 알림톡 건수: " + ata_avail  + "\n"
+					+ word_send + "예정 알림톡 건수: " + count
+					);
+				return false;
+			}
 	}
 	get_cashinfo();
 }
@@ -575,7 +592,7 @@ function completeGetPointInfo(ret_obj, response_tags) {
  */
 function get_cashinfo() {
 	var params = new Array();
-	var response_tags = new Array('error','message','cash','point','sms_price','lms_price','mms_price','deferred_payment');
+	var response_tags = new Array('error','message','cash','point','sms_price','lms_price','mms_price','ata_price','deferred_payment');
 	exec_xml('purplebook', 'getPurplebookCashInfo', params, completeGetCashInfo, response_tags);
 }
 
@@ -589,6 +606,7 @@ function completeGetCashInfo(ret_obj, response_tags) {
 	obj.sms_price = parseInt(ret_obj['sms_price']);
 	obj.lms_price = parseInt(ret_obj['lms_price']);
 	obj.mms_price = parseInt(ret_obj['mms_price']);
+	obj.ata_price = parseInt(ret_obj['ata_price']);
 	obj.deferred_payment = ret_obj['deferred_payment'];
 	do_after_get_cashinfo(obj);
 }
@@ -615,6 +633,8 @@ function do_after_get_cashinfo(cashinfo) {
 		message += getLang('lms') + ' ';
 	} else if (msg_type == 'mms') {
 		message += getLang('mms') + ' ';
+	} else if (msg_type == 'ata') {
+		message += getLang('ata') + ' ';
 	} else {
 		alert('unknown message type');
 	}
@@ -660,6 +680,7 @@ function do_after_get_cashinfo(cashinfo) {
 	sms_avail = calc_sms(cashinfo, cashinfo.sms_price);
 	lms_avail = calc_lms(cashinfo, cashinfo.lms_price);
 	mms_avail = calc_mms(cashinfo, cashinfo.mms_price);
+	ata_avail = calc_mms(cashinfo, cashinfo.ata_price);
 
 	if (msg_type == "sms") {
 		npages = get_page_count();
@@ -693,6 +714,18 @@ function do_after_get_cashinfo(cashinfo) {
 			message += getLang('msg_not_enough_money') + "\n"
 					+ getLang('available_mms_number') + mms_avail  + "\n"
 					+ getLang('arranged_mms_number') + (count) + "\n";
+			alert(message);
+			return false;
+		} else {
+			if (reservflag == '1') message += getLang('reservation_datetime', ': ') + date_format(texting_pickup_reservdate()) + '\n';
+			message += getLang('number_to_send') + count + '\n';
+			if (!confirm(message)) return false;
+		}
+	} else if (msg_type == "ata") {
+		if (count > ata_avail) {
+			message += getLang('msg_not_enough_money') + "\n"
+					+ getLang('available_ata_number') + ata_avail  + "\n"
+					+ getLang('arranged_ata_number') + (count) + "\n";
 			alert(message);
 			return false;
 		} else {
@@ -760,5 +793,13 @@ function calc_lms(cashinfo, point) {
  */
 function calc_mms(cashinfo, point) {
 	if (point == undefined) point = 200;
+	return Math.floor(cashinfo.cash / point) + Math.floor(cashinfo.point / point);
+}
+
+/**
+ * 알림톡 가능건수 계산
+ */
+function calc_ata(cashinfo, point) {
+	if (point == undefined) point = 15;
 	return Math.floor(cashinfo.cash / point) + Math.floor(cashinfo.point / point);
 }

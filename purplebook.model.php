@@ -116,6 +116,7 @@ class purplebookModel extends purplebook
 		$this->add('sms_price', '20');
 		$this->add('lms_price', '50');
 		$this->add('mms_price', '200');
+		$this->add('ata_price', '15');
 	}
 
 	/**
@@ -654,6 +655,42 @@ class purplebookModel extends purplebook
 	}
 
 	/**
+	 * @brief get alimtalk info
+	 */
+	function getPurplebookAlimtalkInfo()
+	{
+		$oAlimTalkModel = &getModel('alimtalk');
+
+		$logged_info = Context::get('logged_info');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
+
+		$output = $oAlimTalkModel->getAlimtalkUsers($logged_info->member_srl);
+		if(!$output->toBool()) return $output;
+
+		$data = array();
+		if($output->data) $data = $output->data;
+		$this->add('data', $data);
+	}
+
+	/**
+	 * @brief get alimtalk template 
+	 */
+	function getPurplebookAlimtalkTemplate()
+	{
+		$oAlimTalkModel = &getModel('alimtalk');
+
+		$logged_info = Context::get('logged_info');
+		if(!$logged_info) return new Object(-1, 'msg_login_required');
+
+		$output = $oAlimTalkModel->getAlimtalkTemplates($logged_info->member_srl);
+		if(!$output->toBool()) return $output;
+
+		$data = array();
+		if($output->data) $data = $output->data;
+		$this->add('data', $data);
+	}
+
+	/**
 	 * folder 가져오기
 	 */
 	function getPurplebookSearchFolder()
@@ -921,6 +958,15 @@ class purplebookModel extends purplebook
 				// 주소록에서 추가된 것들이면
 				if($v->node_id && $node_list[$v->node_id]->node_type == '2')
 				{
+					// 알림톡 사용중이라면 
+					if(Context::get('use_alimtalk') == true)
+					{
+						$match_count = preg_match_all("/#{.*}/Ui", $val);
+						for($i=1; $i<=$match_count; $i++)
+						{
+							$val = preg_replace("/#{.*}/Ui","{memo" . $i . "}", $val, 1);
+						}
+					}
 					$preview_list[$key]->text = $val;
 					$preview_list[$key]->warning = null;
 
